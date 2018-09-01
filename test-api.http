@@ -1,0 +1,15 @@
+# @api= http://127.0.0.1:50901/services
+@api= http://dev.mofunc.com/services
+
+POST  {{api}}/accesses
+Content-Type: application/json
+x-serve: service
+
+{
+	"resource": "/",
+	"ip": "127.0.0.1",
+	"action": "get",
+	"client":"mofunc.com",
+	"host":"mongo.mofunc.com",
+	"referer":"dev.mofunc.com"
+}
