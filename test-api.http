@@ -1,6 +1,7 @@
 # @api= http://127.0.0.1:50901/services
 @api= http://dev.mofunc.com/services
 
+#### notes
 POST  {{api}}/accesses
 Content-Type: application/json
 x-serve: service
@@ -12,4 +13,15 @@ x-serve: service
 	"client":"mofunc.com",
 	"host":"mongo.mofunc.com",
 	"referer":"dev.mofunc.com"
+}
+
+### login
+POST {{api}}/access-tokens
+Content-Type: application/json
+x-serve: service
+
+{
+	"login": "13430142394",
+	"password": "123456",
+	"client":"test"
 }

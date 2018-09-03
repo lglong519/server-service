@@ -6,6 +6,7 @@ const SERVICES_API = '/services/';
 const router = new RestifyRouter();
 
 router.post(SERVICES_API + 'accesses', handlers.Accesses.insert);
+router.post(SERVICES_API + 'access-tokens', handlers.AccessTokens.create);
 
 module.exports = server => {
 	router.applyRoutes(server);

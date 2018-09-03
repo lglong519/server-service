@@ -21,7 +21,7 @@ const DATABASES = require('./common/mongoose-connections');
 const corsMiddleware = require('restify-cors-middleware');
 const cors = corsMiddleware(nconf.get('CORS'));
 
-server.use(morgan('\x1B[32m:method\x1B[39m :url :status :res[content-length] - :response-time ms HTTP/:http-version'));
+server.use(morgan('\x1B[32m:method\x1B[39m :url :status - :response-time ms HTTP/:http-version :referrer :date[clf]'));
 server.use(restify.plugins.acceptParser(server.acceptable));
 server.use(restify.plugins.queryParser());
 server.use(restify.plugins.bodyParser());

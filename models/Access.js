@@ -21,9 +21,6 @@ const mainSchema = new Schema({
 	host: {
 		type: String
 	},
-	hosts: [
-		Schema.Types.Mixed,
-	],
 	referer: {
 		type: String
 	},

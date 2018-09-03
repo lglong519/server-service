@@ -29,6 +29,9 @@ Promise.all(promises).then(() => {
 	console.error(error);
 	process.exit();
 });
+
+mongoose.set('debug', true);
+
 module.exports = {
 	dbs: DATABASES,
 	dbsParser (req, res, next) {

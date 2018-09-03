@@ -4,6 +4,11 @@ const RandToken = require('rand-token');
 const _ = require('lodash');
 const nconf = require('nconf');
 
+nconf.required([
+	'REDIS_URI',
+	'REDIS_EXPIRE_SECONDS'
+]);
+
 const client = new Redis(nconf.get('REDIS_URI'));
 
 /**
@@ -20,8 +25,8 @@ const create = (values, options) => {
 	const schema = Joi.object().min(1).required();
 	const defaultOptions = {
 		type: 'default',
-		length: 9,
-		expire: nconf.get('REDIS_EXPIRE_SECONDS') || 10
+		length: 13,
+		expire: nconf.get('REDIS_EXPIRE_SECONDS')
 	};
 	options = Object.assign(defaultOptions, options);
 	const rand = RandToken.generator({
@@ -48,6 +53,16 @@ const create = (values, options) => {
 		console.error('RedisService create', err);
 	});
 };
+
+const get = key => {
+	return client.hgetall(key).then(result => {
+		return result;
+	}).catch(err => {
+		console.error('RedisService get', err);
+	});
+};
+
 module.exports = {
-	create
+	create,
+	get
 };

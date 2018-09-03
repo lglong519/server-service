@@ -13,6 +13,7 @@ const insert = (req, res, next) => {
 		action: Joi.string().required(),
 		ip: Joi.string().required(),
 		resource: Joi.string().required(),
+		host: Joi.string().required(),
 	}).unknown().required();
 	const validate = Joi.validate(req.body, schema);
 	if (validate.error) {
@@ -21,21 +22,22 @@ const insert = (req, res, next) => {
 	let params = validate.value;
 	Access(req).findOneAndUpdate({
 		action: params.action,
-		ip: params.ip
+		ip: params.ip,
+		host: params.host,
 	}, {
 		$inc: { inc: 1 }
 	}, {
 		new: true
 	}).exec().then(result => {
-		let options = _.omit(params, ['resources', 'hosts', 'referers', 'clients', 'inc']);
+		let options = _.omit(params, ['resources', 'referers', 'clients', 'inc']);
 		if (result) {
 			result.set(options);
 		} else {
 			result = Access(req)(options);
 		}
+		result.client = params.client.slice(0, 20);
 		let now = moment().format('YYYY-MM-DD HH:mm:SS');
 		processArr(params.resource, result.resources, now);
-		processArr(params.host, result.hosts, now);
 		processArr(params.referer, result.referers, now);
 		processArr(params.client, result.clients, now);
 		return result.save();
@@ -55,6 +57,7 @@ function processArr (item, items, now) {
 		}
 	}
 }
+
 module.exports = {
 	insert
 };
