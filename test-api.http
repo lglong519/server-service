@@ -1,5 +1,5 @@
-# @api= http://127.0.0.1:50901/services
-@api= http://dev.mofunc.com/services
+@api= http://127.0.0.1:50901/services
+# @api= http://dev.mofunc.com/services
 
 #### notes
 POST  {{api}}/accesses
@@ -25,3 +25,42 @@ x-serve: service
 	"password": "123456",
 	"client":"test"
 }
+
+### users ###
+
+### create
+POST {{api}}/users
+Content-Type: application/json
+x-serve: service
+
+{
+	"username": "username",
+	"password": "password",
+	"client":"client",
+	"email":"email@email",
+	"phone":"13456789012"
+}
+
+### query users
+GET {{api}}/users
+Content-Type: application/json
+x-serve: service
+
+### get a user
+GET {{api}}/users/5b8e55871cb0e6125a9c0314
+Content-Type: application/json
+x-serve: service
+
+### update a user
+PATCH  {{api}}/users/5b8e55871cb0e6125a9c0314
+Content-Type: application/json
+x-serve: service
+
+{
+	"client": "client"
+}
+
+### delete a user
+DELETE  {{api}}/users/5b8e55111cb0e6125a9c0311
+Content-Type: application/json
+x-serve: service
