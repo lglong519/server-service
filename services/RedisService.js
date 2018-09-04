@@ -3,6 +3,9 @@ const Joi = require('joi');
 const RandToken = require('rand-token');
 const _ = require('lodash');
 const nconf = require('nconf');
+const debug = require('debug');
+
+debug.enable('*');
 
 nconf.required([
 	'REDIS_URI',

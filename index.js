@@ -15,7 +15,9 @@ nconf.required([
 ]);
 process.env.NODE_ENV = nconf.get('NODE_ENV');
 
-const server = restify.createServer({});
+const server = restify.createServer({
+	name: require('package').name
+});
 
 const DATABASES = require('./common/mongoose-connections');
 const corsMiddleware = require('restify-cors-middleware');
