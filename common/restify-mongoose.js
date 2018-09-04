@@ -440,6 +440,47 @@ Resource.prototype.remove = function () {
 	};
 };
 
+Resource.prototype.delete = function () {
+	const self = this;
+	const emitDelete = emitEvent(self, 'delete');
+
+	return function (req, res, next) {
+		const find = {};
+		find[self.options.queryString] = req.params.id;
+		if (typeof self.Model === 'string') {
+			self.Model = req.db.model(self.Model);
+		}
+		let query = self.Model.findOne(find);
+
+		if (self.options.filter) {
+			query = query.where(self.options.filter(req, res));
+		}
+
+		query.exec((err, model) => {
+			if (err) {
+				return next(err);
+			}
+
+			if (!model) {
+				return next(new restifyErrors.ResourceNotFoundError(req.params.id));
+			}
+
+			req.db.model('RecycleBin').create({
+				model: self.Model.modelName,
+				data: model
+			}).then(result => {
+				return model.remove();
+			}).then(result => {
+				res.send(200, model);
+				emitDelete(model, next);
+				next();
+			}).catch(err => {
+				next(err);
+			});
+		});
+	};
+};
+
 Resource.prototype.serve = function (path, server, options) {
 
 	options = options || {};

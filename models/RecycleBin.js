@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const timestamps = require('mongoose-timestamp');
 
 const mainSchema = new Schema({
-	modeName: {
+	model: {
 		type: String,
 		required: true
 	},
