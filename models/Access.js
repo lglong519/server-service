@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const timestamps = require('mongoose-timestamp');
 
 const mainSchema = new Schema({
 	action: {
@@ -39,6 +38,5 @@ const mainSchema = new Schema({
 	},
 });
 
-mainSchema.plugin(timestamps);
 module.exports = db => db.model('Access', mainSchema, 'accesses');
 module.exports(mongoose);

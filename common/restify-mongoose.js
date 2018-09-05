@@ -467,6 +467,7 @@ Resource.prototype.delete = function () {
 
 			req.db.model('RecycleBin').create({
 				model: self.Model.modelName,
+				id: model._id,
 				data: model
 			}).then(result => {
 				return model.remove();

@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const timestamps = require('mongoose-timestamp');
 const { encrypt } = require('common/mongoose-plugins');
 
 const mainSchema = new Schema({
@@ -38,7 +37,6 @@ const mainSchema = new Schema({
 	},
 });
 
-mainSchema.plugin(timestamps);
 mainSchema.plugin(encrypt, { paths: ['email', 'phone', 'password'] });
 module.exports = db => db.model('User', mainSchema, 'users');
 module.exports(mongoose);
