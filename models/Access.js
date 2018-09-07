@@ -32,6 +32,9 @@ const mainSchema = new Schema({
 	clients: [
 		Schema.Types.Mixed,
 	],
+	bodies: [
+		Schema.Types.Mixed,
+	],
 	inc: {
 		type: Number,
 		default: 1

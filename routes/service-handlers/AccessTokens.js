@@ -19,6 +19,7 @@ const create = (req, res, next) => {
 	}).required();
 	const validate = Joi.validate(req.body, schema);
 	if (validate.error) {
+		console.log('validate.error', validate.error);
 		return next(new Errors.InvalidArgumentError(validate.error));
 	}
 	const params = validate.value;
@@ -63,6 +64,7 @@ const create = (req, res, next) => {
 		res.json(token);
 		next();
 	}).catch(err => {
+		console.log('AccessTokens create error', err);
 		next(err);
 	});
 };

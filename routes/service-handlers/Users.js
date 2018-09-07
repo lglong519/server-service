@@ -1,4 +1,4 @@
-const restifyMongoose = require('common/restify-mongoose');
+const restifyMongoose = require('restify-mongoose');
 const Joi = require('joi');
 const regExp = require('common/regExp');
 const Errors = require('restify-errors');

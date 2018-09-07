@@ -345,7 +345,7 @@ Resource.prototype.insert = function (options) {
 		if (typeof self.Model === 'string') {
 			self.Model = req.db.model(self.Model);
 		}
-		const model = new self.Model(req.body);
+		const model = self.Model(req.body);
 		async.waterfall([
 			execBeforeSave(req, model, options.beforeSave),
 			execSave(model),

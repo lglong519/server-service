@@ -1,6 +1,8 @@
 const nconf = require('nconf');
 nconf.required(['MONGO_URI']);
 
+const debug = require('debug')('connections');
+const debugErr = require('debug')('connections:Error');
 const _ = require('lodash');
 const mongoose = require('mongoose');
 const MONGO_URI = nconf.get('MONGO_URI');
@@ -19,18 +21,19 @@ const DATABASES = {};
 _.each(nconf.get('DATABASES'), (val, key) => {
 	DATABASES[key] = mongoose.createConnection(MONGO_URI + val, { autoIndex: true, useNewUrlParser: true });
 	DATABASES[key].on('connected', () => {
-		console.log(`Mongoose connect to ${MONGO_URI}${val}`);
+		debug(`Mongoose connect to ${MONGO_URI}${val}`);
 	});
 	DATABASES[key].on('error', () => {
-		console.error('MongoDB connection error:', val);
+		debugErr('MongoDB connection error:', val);
+		process.exit(-1);
 	});
 	_.each(models, item => item(DATABASES[key]));
 	promises.push(DATABASES[key]);
 });
 Promise.all(promises).then(() => {
-	console.log('connections done');
+	debug('connections done');
 }).catch(error => {
-	console.error(error);
+	debugErr(error);
 	process.exit();
 });
 
@@ -39,13 +42,14 @@ module.exports = {
 	dbsParser (req, res, next) {
 		req.session = {};
 		req.dbs = DATABASES;
+		req.db = null;
 		let { 'x-serve': serve } = req.headers;
 		if (!serve) {
 			serve = 'pass';
 			req.session.pass = true;
 			console.error(`\x1B[31mInvalid x-serve:${serve}\x1B[39m`);
 		}
-		req.db = DATABASES[serve];
+		req.db = req.dbs[serve];
 		if (!req.db) {
 			return next(Error(`Invalid x-serve:${serve}`));
 		}

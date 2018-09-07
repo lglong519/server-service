@@ -1,7 +1,7 @@
 {
 	"name": "server-service",
-	"version": "1.0.2",
-	"description": "request service",
+	"version": "1.0.3",
+	"description": "api service",
 	"main": "index.js",
 	"scripts": {
 		"dev": "supervisor --no-restart-on error index",
@@ -28,7 +28,7 @@
 		"extends": "teslint"
 	},
 	"devDependencies": {
-		"eslint-config-teslint": "latest",
+		"eslint-config-teslint": "^3.0.7",
 		"gulp": "^4.0.0",
 		"gulp-replace": "^1.0.0",
 		"gulp-ssh": "^0.7.0"
@@ -36,16 +36,19 @@
 	"dependencies": {
 		"app-module-path": "^2.2.0",
 		"async": "^2.6.1",
+		"basic-auth": "^2.0.0",
+		"depd": "^1.1.2",
 		"ioredis": "^4.0.0",
 		"joi": "^13.6.0",
 		"lodash": "^4.17.10",
 		"moment": "^2.22.2",
 		"mongoose": "^5.2.12",
 		"mongoose-timestamp": "^0.6.0",
-		"morgan": "^1.9.0",
 		"nconf": "^0.10.0",
 		"nodemailer": "^4.6.8",
 		"nodemailer-smtp-transport": "^2.7.4",
+		"on-finished": "^2.3.0",
+		"on-headers": "^1.0.1",
 		"rand-token": "^0.4.0",
 		"require-dir": "^1.0.0",
 		"restify": "^7.2.1",

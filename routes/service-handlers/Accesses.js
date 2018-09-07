@@ -1,4 +1,4 @@
-const restifyMongoose = require('common/restify-mongoose');
+const restifyMongoose = require('restify-mongoose');
 const Model = require('common/Model');
 const Joi = require('joi');
 const _ = require('lodash');
@@ -14,9 +14,11 @@ const insert = (req, res, next) => {
 		ip: Joi.string().required(),
 		resource: Joi.string().required(),
 		host: Joi.string().required(),
+		client: Joi.string().default(''),
 	}).unknown().required();
 	const validate = Joi.validate(req.body, schema);
 	if (validate.error) {
+		console.log('validate.error', validate.error);
 		return next(new Errors.InvalidArgumentError(validate.error));
 	}
 	let params = validate.value;
@@ -29,7 +31,7 @@ const insert = (req, res, next) => {
 	}, {
 		new: true
 	}).exec().then(result => {
-		let options = _.omit(params, ['resources', 'referers', 'clients', 'inc']);
+		let options = _.omit(params, ['resources', 'referers', 'clients', 'bodies', 'inc']);
 		if (result) {
 			result.set(options);
 		} else {
@@ -40,11 +42,13 @@ const insert = (req, res, next) => {
 		processArr(params.resource, result.resources, now);
 		processArr(params.referer, result.referers, now);
 		processArr(params.client, result.clients, now);
+		processArr(params.body, result.bodies, now);
 		return result.save();
 	}).then(result => {
 		res.json(result);
 		next();
 	}).catch(err => {
+		console.log('Access insert error', err);
 		next(err);
 	});
 };

@@ -1,9 +1,11 @@
 const restify = require('restify');
 const nconf = require('nconf');
 const localhost = require('./common/getHost');
-const morgan = require('morgan');
 
 require('app-module-path').addPath(__dirname);
+require('app-module-path').addPath(`${__dirname}/modules`);
+
+const morgan = require('morgan');
 
 nconf.file('.config').env();
 
@@ -23,7 +25,7 @@ const DATABASES = require('./common/mongoose-connections');
 const corsMiddleware = require('restify-cors-middleware');
 const cors = corsMiddleware(nconf.get('CORS'));
 
-server.use(morgan('\x1B[32m:method\x1B[39m :url :status - :response-time ms HTTP/:http-version :referrer :date[clf]'));
+server.use(morgan('dev'));
 server.use(restify.plugins.acceptParser(server.acceptable));
 server.use(restify.plugins.queryParser());
 server.use(restify.plugins.bodyParser());
