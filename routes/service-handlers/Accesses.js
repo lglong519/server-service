@@ -3,8 +3,9 @@ const Model = require('common/Model');
 const Joi = require('joi');
 const _ = require('lodash');
 const moment = require('moment');
-
+const debug = require('debug')('server:api');
 const Errors = require('restify-errors');
+const getClient = require('common/getClient');
 
 const Access = Model('Access');
 
@@ -18,7 +19,8 @@ const insert = (req, res, next) => {
 	}).unknown().required();
 	const validate = Joi.validate(req.body, schema);
 	if (validate.error) {
-		console.log('validate.error', validate.error);
+		debug(req.body);
+		debug('validate.error', validate.error);
 		return next(new Errors.InvalidArgumentError(validate.error));
 	}
 	let params = validate.value;
@@ -37,27 +39,35 @@ const insert = (req, res, next) => {
 		} else {
 			result = Access(req)(options);
 		}
-		result.client = params.client.slice(0, 20);
+		result.client = getClient(params.client);
 		let now = moment().format('YYYY-MM-DD HH:mm:SS');
-		processArr(params.resource, result.resources, now);
-		processArr(params.referer, result.referers, now);
-		processArr(params.client, result.clients, now);
-		processArr(params.body, result.bodies, now);
+		processArr(result, 'resources', params.resource, now);
+		processArr(result, 'referers', params.referer, now);
+		processArr(result, 'clients', params.client, now);
+		processArr(result, 'bodies', params.body, now);
 		return result.save();
 	}).then(result => {
 		res.json(result);
 		next();
 	}).catch(err => {
-		console.log('Access insert error', err);
+		debug(req.body);
+		debug('Access insert error', err);
 		next(err);
 	});
 };
 
-function processArr (item, items, now) {
+function processArr (data, items, item, now) {
 	if (item) {
-		if (items.indexOf(item) < 0) {
-			items.push(item);
-			items.push(now);
+		if (typeof item === 'object' && Object.keys(item) < 1) {
+			return;
+		}
+		if (_.get(data[items], '[0]')) {
+			if (data[items].indexOf(item) < 0) {
+				data[items].push(item);
+				data[items].push(now);
+			}
+		} else {
+			data[items] = [item, now];
 		}
 	}
 }

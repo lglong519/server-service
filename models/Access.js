@@ -10,31 +10,31 @@ const mainSchema = new Schema({
 		type: String,
 		required: true
 	},
+	host: {
+		type: String
+	},
 	resource: {
 		type: String,
 		required: true
 	},
-	resources: [
-		Schema.Types.Mixed,
-	],
-	host: {
-		type: String
+	resources: {
+		type: Schema.Types.Mixed,
 	},
 	referer: {
 		type: String
 	},
-	referers: [
-		Schema.Types.Mixed,
-	],
+	referers: {
+		type: Schema.Types.Mixed,
+	},
 	client: {
 		type: String
 	},
-	clients: [
-		Schema.Types.Mixed,
-	],
-	bodies: [
-		Schema.Types.Mixed,
-	],
+	clients: {
+		type: Schema.Types.Mixed,
+	},
+	bodies: {
+		type: Schema.Types.Mixed,
+	},
 	inc: {
 		type: Number,
 		default: 1
