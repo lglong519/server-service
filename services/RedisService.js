@@ -4,8 +4,8 @@ const RandToken = require('rand-token');
 const _ = require('lodash');
 const nconf = require('nconf');
 const debug = require('debug');
-
-debug.enable('*');
+const DateTime = require('../common/dateTime');
+const debugErr = debug('server:redis');
 
 nconf.required([
 	'REDIS_URI',
@@ -13,6 +13,7 @@ nconf.required([
 ]);
 
 const client = new Redis(nconf.get('REDIS_URI'));
+const expire = nconf.get('REDIS_EXPIRE_SECONDS');
 
 /**
  * @description
@@ -29,7 +30,7 @@ const create = (values, options) => {
 	const defaultOptions = {
 		type: 'default',
 		length: 13,
-		expire: nconf.get('REDIS_EXPIRE_SECONDS')
+		expire
 	};
 	options = Object.assign(defaultOptions, options);
 	const rand = RandToken.generator({
@@ -50,10 +51,12 @@ const create = (values, options) => {
 			throw err;
 		}
 	});
+	const expireAt = new DateTime().offsetInSeconds(options.expire);
+	doc.expireAt = expireAt;
 	return client.multi().hmset(values.id, doc).expire(values.id, options.expire).hgetall(values.id).exec().then(result => {
 		return _.get(result, '[2][1]');
 	}).catch(err => {
-		console.error('RedisService create', err);
+		debugErr('RedisService create', err);
 	});
 };
 
@@ -61,11 +64,25 @@ const get = key => {
 	return client.hgetall(key).then(result => {
 		return result;
 	}).catch(err => {
-		console.error('RedisService get', err);
+		debugErr('RedisService get', err);
+	});
+};
+
+const fetch = key => {
+	return client.multi().expire(key, expire).hgetall(key).exec().then(result => {
+		let doc = _.get(result, '[1][1]');
+		if (_.isEmpty(doc)) {
+			throw Error('Doc is expired or not found.');
+		}
+		doc.expireAt = new DateTime().offsetInSeconds(expire);
+		return doc;
+	}).catch(err => {
+		debugErr('RedisService fetch', err);
 	});
 };
 
 module.exports = {
 	create,
-	get
+	fetch,
+	get,
 };

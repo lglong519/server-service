@@ -1,10 +1,12 @@
 const restify = require('restify');
 const nconf = require('nconf');
-const localhost = require('./common/getHost');
+const debug = require('debug');
+debug.enable('*');
 
 require('app-module-path').addPath(__dirname);
 require('app-module-path').addPath(`${__dirname}/modules`);
 
+const localhost = require('common/getHost');
 const morgan = require('morgan');
 
 nconf.file('.config').env();
@@ -21,7 +23,7 @@ const server = restify.createServer({
 	name: require('package').name
 });
 
-const DATABASES = require('./common/mongoose-connections');
+const DATABASES = require('common/mongoose-connections');
 const corsMiddleware = require('restify-cors-middleware');
 const cors = corsMiddleware(nconf.get('CORS'));
 
@@ -34,9 +36,9 @@ server.pre(cors.preflight);
 server.use(cors.actual);
 server.use(DATABASES.dbsParser);
 
-const greetingRoutes = require('./routes/greeting');
+const greetingRoutes = require('routes/greeting');
 greetingRoutes(server);
-const serviceRoutes = require('./routes/service');
+const serviceRoutes = require('routes/service');
 serviceRoutes(server);
 
 server.listen(nconf.get('PORT'), nconf.get('HOST'), () => {
