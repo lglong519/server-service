@@ -1,7 +1,7 @@
 const restify = require('restify');
 const nconf = require('nconf');
 const debug = require('debug');
-debug.enable('*');
+debug.enable('*,-morgan');
 
 require('app-module-path').addPath(__dirname);
 require('app-module-path').addPath(`${__dirname}/modules`);

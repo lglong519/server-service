@@ -61,7 +61,7 @@ function processArr (data, items, item, now) {
 		if (typeof item === 'object' && Object.keys(item) < 1) {
 			return;
 		}
-		if (_.get(data[items], '[0]')) {
+		if (!_.isEmpty(data[items])) {
 			if (data[items].indexOf(item) < 0) {
 				data[items].push(item);
 				data[items].push(now);
@@ -69,6 +69,9 @@ function processArr (data, items, item, now) {
 		} else {
 			data[items] = [item, now];
 		}
+		let _tmp = [...data[items]];
+		data[items] = undefined;
+		data[items] = _tmp;
 	}
 }
 

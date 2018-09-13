@@ -25,7 +25,7 @@ module.exports.token = token
  */
 
 var auth = require('basic-auth')
-var debug = require('debug')('morgan')
+var debug = require('debug')('server:morgan')
 var deprecate = require('depd')('morgan')
 var onFinished = require('on-finished')
 var onHeaders = require('on-headers')
