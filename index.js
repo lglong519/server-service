@@ -1,7 +1,7 @@
 const restify = require('restify');
 const nconf = require('nconf');
-const debug = require('debug');
-debug.enable('*,-morgan');
+const debug = require('debug')('server:index');
+require('debug').enable('*,-morgan');
 
 require('app-module-path').addPath(__dirname);
 require('app-module-path').addPath(`${__dirname}/modules`);
@@ -41,6 +41,10 @@ greetingRoutes(server);
 const serviceRoutes = require('routes/service');
 serviceRoutes(server);
 
-server.listen(nconf.get('PORT'), nconf.get('HOST'), () => {
-	console.log('ready on \x1B[33m%s\x1B[39m ,NODE_ENV: \x1B[32m%s\x1B[39m ,localhost: \x1B[35m%s\x1B[39m', server.url, nconf.get('NODE_ENV'), localhost);
+server.listen(nconf.get('PORT'), () => {
+	debug('ready on \x1B[33m%s\x1B[39m ,NODE_ENV: \x1B[32m%s\x1B[39m ,localhost: \x1B[35m%s\x1B[39m', server.url, nconf.get('NODE_ENV'), localhost);
+});
+server.on('error', err => {
+	debug(err);
+	process.exit();
 });

@@ -14,7 +14,7 @@ const insert = (req, res, next) => {
 		action: Joi.string().required(),
 		ip: Joi.string().required(),
 		resource: Joi.string().required(),
-		host: Joi.string().required(),
+		host: Joi.string(),
 		client: Joi.string().default(''),
 	}).unknown().required();
 	const validate = Joi.validate(req.body, schema);
