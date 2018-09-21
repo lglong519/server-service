@@ -47,7 +47,7 @@ const insert = (req, res, next) => {
 		processArr(result, 'bodies', params.body, now);
 		return result.save();
 	}).then(result => {
-		res.json(result);
+		req.query.return === 'true' ? res.json(result) : res.send(204);
 		next();
 	}).catch(err => {
 		debug(req.body);

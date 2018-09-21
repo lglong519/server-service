@@ -46,5 +46,30 @@ server.listen(nconf.get('PORT'), () => {
 });
 server.on('error', err => {
 	debug(err);
+	if ((/EADDRINUSE/i).test(err.code)) {
+		debug(`端口:${err.port} 被占用`);
+	}
 	process.exit();
 });
+
+server.on(
+	'after',
+	restify.plugins.auditLogger({
+		log: require('bunyanLogger').createLogger({
+			name: 'auditlogs',
+			streams: [
+				{
+					type: 'rotating-file',
+					path: './logs/auditlogs.log',
+					period: '1d',
+					count: 30,
+					collection: 'auditlogs'
+				}
+			],
+		}),
+		body: true,
+		event: 'after',
+		server,
+		printLog: true
+	})
+);

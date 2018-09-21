@@ -1,6 +1,6 @@
 {
-	"name": "server-service",
-	"version": "1.0.3",
+	"name": "mofunc-service",
+	"version": "1.0.4",
 	"description": "api service",
 	"main": "index.js",
 	"scripts": {
