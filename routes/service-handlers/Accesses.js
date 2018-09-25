@@ -75,6 +75,11 @@ function processArr (data, items, item, now) {
 	}
 }
 
+const handle = restifyMongoose('Access', {
+	pageSize: 10,
+	sort: '-updateAt'
+});
 module.exports = {
-	insert
+	insert,
+	query: handle.query(),
 };
