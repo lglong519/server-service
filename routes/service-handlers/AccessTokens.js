@@ -24,9 +24,7 @@ const create = (req, res, next) => {
 		return next(new Errors.InvalidArgumentError(validate.error));
 	}
 	const params = validate.value;
-	const options = {
-		password: params.password,
-	};
+	const options = {};
 
 	if (regExp.account.test(params.login)) {
 		options.username = params.login;
@@ -48,6 +46,10 @@ const create = (req, res, next) => {
 		if (!result) {
 			throw new Errors.InvalidContentError('USER_NOT_FOUND');
 		}
+		if (result.password !== params.password) {
+			throw new Errors.InvalidContentError('INVALID_PASSWORD');
+		}
+
 		return RedisService.create({
 			user: result._id,
 			client: params.client,
@@ -61,7 +63,7 @@ const create = (req, res, next) => {
 			id: token.user,
 			data: params
 		});
-	}).then(result => {
+	}).then(() => {
 		res.json(token);
 		next();
 	}).catch(err => {

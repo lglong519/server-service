@@ -77,7 +77,7 @@ function processArr (data, items, item, now) {
 
 const handle = restifyMongoose('Access', {
 	pageSize: 10,
-	sort: '-updateAt'
+	sort: '-updatedAt'
 });
 module.exports = {
 	insert,
