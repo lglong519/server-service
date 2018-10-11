@@ -15,6 +15,12 @@ x-serve: service
 	"referer":"dev.mofunc.com"
 }
 
+#### get accesses
+GET {{api}}/accesses
+Content-Type: application/json
+x-serve: service
+
+
 ### login
 POST {{api}}/access-tokens
 Content-Type: application/json
@@ -26,7 +32,7 @@ x-serve: service
 	"client":"test"
 }
 
-### users ###
+### users ++++++
 
 ### create
 POST {{api}}/users
@@ -64,3 +70,47 @@ x-serve: service
 DELETE  {{api}}/users/5b8e55111cb0e6125a9c0311
 Content-Type: application/json
 x-serve: service
+
+### users ------
+
+
+### packages ++++++
+
+### create
+POST {{api}}/packages
+Content-Type: application/json
+x-serve: service
+
+{
+	"username": "username",
+	"password": "password",
+	"client":"client",
+	"email":"email@email",
+	"phone":"13456789012"
+}
+
+### query packages
+GET {{api}}/packages
+Content-Type: application/json
+x-serve: service
+
+### get a package
+GET {{api}}/packages/5b8e55871cb0e6125a9c0314
+Content-Type: application/json
+x-serve: service
+
+### update a package
+PATCH  {{api}}/packages/5b8e55871cb0e6125a9c0314
+Content-Type: application/json
+x-serve: service
+
+{
+	"client": "client"
+}
+
+### delete a package
+DELETE  {{api}}/packages/5b8e55111cb0e6125a9c0311
+Content-Type: application/json
+x-serve: service
+
+### packages ------
