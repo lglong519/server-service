@@ -4,30 +4,42 @@ const handlers = require('require-dir')('service-handlers');
 const middleWares = require('require-dir')('middleWares');
 const SERVICES_API = '/services/';
 
+const publicRouter = new RestifyRouter();
+
+publicRouter.post(SERVICES_API + 'accesses', handlers.Accesses.insert);
+publicRouter.post(SERVICES_API + 'access-tokens', handlers.AccessTokens.create);
+publicRouter.get(SERVICES_API + 'packages', handlers.Packages.query);
+publicRouter.get(SERVICES_API + 'packages/:id', handlers.Packages.detail);
+
 const router = new RestifyRouter();
+router.use(middleWares.initToken);
 
-router.post(SERVICES_API + 'accesses', handlers.Accesses.insert);
-router.post(SERVICES_API + 'access-tokens', handlers.AccessTokens.create);
-router.get(SERVICES_API + 'packages', handlers.Packages.query);
-router.get(SERVICES_API + 'packages/:id', handlers.Packages.detail);
+router.get(SERVICES_API + 'accesses', handlers.Accesses.query);
 
-const authRouter = new RestifyRouter();
-authRouter.use(middleWares.initToken);
+router.post(SERVICES_API + 'users', handlers.Users.insert);
+router.get(SERVICES_API + 'users', handlers.Users.query);
+router.get(SERVICES_API + 'users/:id', handlers.Users.detail);
+router.patch(SERVICES_API + 'users/:id', handlers.Users.update);
+router.del(SERVICES_API + 'users/:id', handlers.Users.delete);
 
-authRouter.get(SERVICES_API + 'accesses', handlers.Accesses.query);
+router.post(SERVICES_API + 'packages', handlers.Packages.insert);
+router.patch(SERVICES_API + 'packages/:id', handlers.Packages.update);
+router.del(SERVICES_API + 'packages/:id', handlers.Packages.delete);
 
-authRouter.post(SERVICES_API + 'users', handlers.Users.insert);
-authRouter.get(SERVICES_API + 'users', handlers.Users.query);
-authRouter.get(SERVICES_API + 'users/:id', handlers.Users.detail);
-authRouter.patch(SERVICES_API + 'users/:id', handlers.Users.update);
-authRouter.del(SERVICES_API + 'users/:id', handlers.Users.delete);
+router.post(SERVICES_API + 'press-ups', handlers.PressUps.insert);
+router.get(SERVICES_API + 'press-ups', handlers.PressUps.query);
+router.get(SERVICES_API + 'press-ups/:id', handlers.PressUps.detail);
+router.patch(SERVICES_API + 'press-ups/:id', handlers.PressUps.update);
+router.del(SERVICES_API + 'press-ups/:id', handlers.PressUps.delete);
 
-authRouter.post(SERVICES_API + 'packages', handlers.Packages.insert);
-authRouter.patch(SERVICES_API + 'packages/:id', handlers.Packages.update);
-authRouter.del(SERVICES_API + 'packages/:id', handlers.Packages.delete);
+router.post(SERVICES_API + 'squats', handlers.Squats.insert);
+router.get(SERVICES_API + 'squats', handlers.Squats.query);
+router.get(SERVICES_API + 'squats/:id', handlers.Squats.detail);
+router.patch(SERVICES_API + 'squats/:id', handlers.Squats.update);
+router.del(SERVICES_API + 'squats/:id', handlers.Squats.delete);
 
 module.exports = server => {
 	server.use(middleWares.InitProps);
+	publicRouter.applyRoutes(server);
 	router.applyRoutes(server);
-	authRouter.applyRoutes(server);
 };

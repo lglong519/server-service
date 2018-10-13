@@ -1,5 +1,6 @@
 @api= http://127.0.0.1:50901/services
 # @api= http://dev.mofunc.com/services
+@accessToken= mOIGmhNnFitzy
 
 #### notes
 POST  {{api}}/accesses
@@ -114,3 +115,46 @@ Content-Type: application/json
 x-serve: service
 
 ### packages ------
+
+
+### squats ++++++
+
+### create
+POST {{api}}/squats
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}
+
+{
+	"count": 10,
+	"referenceDate":"2018-09-30"
+}
+
+### query squats
+GET {{api}}/squats
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}
+
+### get a squat
+GET {{api}}/squats/5bc20639a612ec187856e111
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}
+
+### update a squat
+PATCH  {{api}}/squats/5b8e55871cb0e6125a9c0314
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}
+
+{
+	"count": 30
+}
+
+### delete a squat
+DELETE  {{api}}/squats/5b8e55111cb0e6125a9c0311
+Content-Type: application/json
+x-serve: service
+
+### squats ------
