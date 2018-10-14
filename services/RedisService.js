@@ -29,7 +29,7 @@ const create = (values, options) => {
 	const schema = Joi.object().min(1).required();
 	const defaultOptions = {
 		type: 'default',
-		length: 13,
+		length: 24,
 		expire
 	};
 	options = Object.assign(defaultOptions, options);
@@ -62,7 +62,9 @@ const create = (values, options) => {
 
 const get = key => {
 	return client.hgetall(key).then(result => {
-		return result;
+		if (result && Object.keys(result).length) {
+			return result;
+		}
 	}).catch(err => {
 		debugErr('RedisService get', err);
 	});
@@ -81,8 +83,17 @@ const fetch = key => {
 	});
 };
 
+const remove = key => {
+	return client.del(key).then(count => {
+		return count;
+	}).catch(err => {
+		debugErr('RedisService remove', err);
+	});
+};
+
 module.exports = {
 	create,
 	fetch,
 	get,
+	remove,
 };

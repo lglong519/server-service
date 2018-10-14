@@ -14,7 +14,9 @@ publicRouter.get(SERVICES_API + 'packages/:id', handlers.Packages.detail);
 const router = new RestifyRouter();
 router.use(middleWares.initToken);
 
+router.del(SERVICES_API + 'access-tokens', handlers.AccessTokens.remove);
 router.get(SERVICES_API + 'accesses', handlers.Accesses.query);
+router.get(SERVICES_API + 'me', handlers.Me.profile);
 
 router.post(SERVICES_API + 'users', handlers.Users.insert);
 router.get(SERVICES_API + 'users', handlers.Users.query);

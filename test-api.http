@@ -1,6 +1,23 @@
 @api= http://127.0.0.1:50901/services
 # @api= http://dev.mofunc.com/services
-@accessToken= mOIGmhNnFitzy
+@accessToken= cH6ZaK5ufS7tV
+
+### login
+POST {{api}}/access-tokens
+Content-Type: application/json
+x-serve: service
+
+{
+	"login": "admin",
+	"password": "123456",
+	"client":"test"
+}
+
+#### get my profile
+GET {{api}}/me
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}
 
 #### notes
 POST  {{api}}/accesses
@@ -20,18 +37,6 @@ x-serve: service
 GET {{api}}/accesses
 Content-Type: application/json
 x-serve: service
-
-
-### login
-POST {{api}}/access-tokens
-Content-Type: application/json
-x-serve: service
-
-{
-	"login": "13430142394",
-	"password": "123456",
-	"client":"test"
-}
 
 ### users ++++++
 

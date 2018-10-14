@@ -72,6 +72,17 @@ const create = (req, res, next) => {
 	});
 };
 
+const remove = (req, res, next) => {
+	const { 'x-access-token': accessToken } = req.headers;
+	RedisService.remove(accessToken).then(() => {
+		res.send(204);
+		next();
+	}).catch(err => {
+		debug('AccessTokens remove error', err);
+		next(err);
+	});
+};
 module.exports = {
-	create
+	create,
+	remove,
 };

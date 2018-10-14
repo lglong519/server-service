@@ -32,6 +32,9 @@ const mainSchema = new Schema({
 		type: Number,
 		default: 0
 	},
+	image: {
+		type: String,
+	},
 	data: {
 		type: Schema.Types.Mixed
 	},
@@ -40,3 +43,16 @@ const mainSchema = new Schema({
 mainSchema.plugin(encrypt, { paths: ['email', 'phone', 'password'] });
 module.exports = db => db.model('User', mainSchema, 'users');
 module.exports(mongoose);
+
+mainSchema.statics.NonPrivacy = () => [
+	'_id',
+	'username',
+	'email',
+	'phone',
+	'inc',
+	'client',
+	'image',
+	'data',
+	'updatedAt',
+	'createdAt',
+];

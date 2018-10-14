@@ -7,7 +7,7 @@ module.exports = (req, res, next) => {
 	if (!accessToken) {
 		next(new Errors.UnauthorizedError('Unauthorized'));
 	} else {
-		RedisService.get(accessToken).then(result => {
+		RedisService.fetch(accessToken).then(result => {
 			if (!result) {
 				throw new Errors.UnauthorizedError('INVALID_TOKEN');
 			}
