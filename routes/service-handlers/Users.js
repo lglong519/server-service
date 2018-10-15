@@ -16,7 +16,21 @@ const beforeSave = (req, model, cb) => {
 	if (validate.error) {
 		return cb(new Errors.InvalidArgumentError(validate.error));
 	}
-	cb();
+	req.db.model('User').findOne({
+		username: {
+			'$regex': `^${model.username}$`,
+			'$options': '$i'
+		}
+	}).exec().then(result => {
+		if (result) {
+			cb(new Errors.InvalidArgumentError('USER_EXISTS'));
+		} else {
+			cb();
+		}
+	}).catch(err => {
+		cb(err);
+	});
+
 };
 module.exports = {
 	insert: handler.insert({ beforeSave }),

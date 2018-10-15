@@ -26,8 +26,12 @@ const create = (req, res, next) => {
 	const params = validate.value;
 	const options = {};
 
+	// username 不区分大小写
 	if (regExp.account.test(params.login)) {
-		options.username = params.login;
+		options.username = {
+			'$regex': `^${params.login}$`,
+			'$options': '$i'
+		};
 	} else	if (regExp.CHNPhone.test(params.login)) {
 		options.phone = params.login;
 	} else {
