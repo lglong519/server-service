@@ -13,6 +13,11 @@ x-serve: service
 	"client":"test"
 }
 
+### check token
+GET {{api}}/access-tokens
+Content-Type: application/json
+x-serve: service
+
 #### get my profile
 GET {{api}}/me
 Content-Type: application/json

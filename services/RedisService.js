@@ -60,6 +60,10 @@ const create = (values, options) => {
 	});
 };
 
+/**
+ * @description token 只获取不续期，成功返回 token，失败返回 false
+ * @param {*} key token
+ */
 const get = key => {
 	return client.hgetall(key).then(result => {
 		if (result && Object.keys(result).length) {
@@ -70,6 +74,10 @@ const get = key => {
 	});
 };
 
+/**
+ * @description token 获取与续期，返回 token
+ * @param {*} key token
+ */
 const fetch = key => {
 	return client.multi().expire(key, expire).hgetall(key).exec().then(result => {
 		let doc = _.get(result, '[1][1]');

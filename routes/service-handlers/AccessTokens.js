@@ -86,7 +86,31 @@ const remove = (req, res, next) => {
 		next(err);
 	});
 };
+
+const check = (req, res, next) => {
+	const { 'x-access-token': accessToken } = req.headers;
+	let payload = {
+		code: '2000',
+		user: undefined
+	};
+	RedisService.get(accessToken).then(result => {
+		if (result) {
+			return User(req).findById(result.user).exec();
+		}
+		payload.code = '4000';
+	}).then(result => {
+		if (result) {
+			payload.user = result.username;
+		}
+		res.send(payload);
+		next();
+	}).catch(err => {
+		debug('AccessTokens check error', err);
+		next(err);
+	});
+};
 module.exports = {
 	create,
 	remove,
+	check,
 };
