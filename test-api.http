@@ -168,3 +168,19 @@ Content-Type: application/json
 x-serve: service
 
 ### squats ------
+
+### aggregation ++++++
+
+### get aggregation
+GET {{api}}/aggregation
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}
+
+### get aggregation
+GET {{api}}/aggregation/git
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}
+
+### aggregation ------

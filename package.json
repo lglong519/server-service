@@ -50,6 +50,8 @@
 		"on-finished": "^2.3.0",
 		"on-headers": "^1.0.1",
 		"rand-token": "^0.4.0",
+		"request": "^2.88.0",
+		"request-promise": "^4.2.2",
 		"require-dir": "^1.0.0",
 		"restify": "^7.2.1",
 		"restify-cors-middleware": "^1.1.1",
