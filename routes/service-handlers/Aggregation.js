@@ -2,6 +2,12 @@
 const request = require('request-promise');
 const DateTime = require('common/dateTime');
 const moment = require('moment');
+const debug = require('debug')('server:Aggregation');
+const nconf = require('nconf');
+
+nconf.required([
+	'ACCESS_TOKEN'
+]);
 
 const query = (req, res, next) => {
 	let payload = {};
@@ -30,46 +36,88 @@ const query = (req, res, next) => {
 };
 
 const git = (req, res, next) => {
-	let payload = {
-		weekCommits: []
+	debug('git start');
+	const owner = req.params.owner;
+	const headers = {
+		'User-Agent': 'MoFunc.com'
+	};
+	const qs = {
+		access_token: nconf.get('ACCESS_TOKEN')
+	};
+	const format = 'YYYY-MM-DD';
+	const payload = {
+		repos: [],
+		commits: {
+			total: 0,
+			today: 0,
+			week: [0, 0, 0, 0, 0, 0, 0],
+			list: {
+				/*
+				'xxx': {
+					total: 0,
+					today: 0,
+					week: [],
+				},
+				*/
+			}
+		}
 	};
 
-	let commitOptions = {
-		uri: 'https://api.github.com/repos/lglong519/form-libs/commits',
-		headers: {
-			'User-Agent': 'MoFunc.com'
-		},
+	const reposOptions = {
+		uri: `https://api.github.com/users/${owner}/repos`,
+		qs,
+		headers,
 		json: true
 	};
-	let promises = [
-		request(commitOptions).then(results => {
-			let format = 'YYYY-MM-DD';
-			let dateTime = new DateTime(new Date(), format);
-			let week = [];
-			for (let i = 0; i < 7; i++) {
-				week[i] = dateTime.offsetInDays(-1 * i);
-			}
-			let weekCommits = [];
-			results.forEach(elem => {
-				let date = moment(elem.commit.committer.date).format(format);
-				let index = week.indexOf(date);
-				if (index > -1) {
+	request(reposOptions).then(results => {
+		debug('repos count:', results.length);
+		const promises = [];
+		let n = 0;
+		payload.repos = results.map((item, i) => {
+			const commitOptions = {
+				uri: `https://api.github.com/repos/${owner}/${item.name}/commits`,
+				qs,
+				headers,
+				json: true
+			};
+			promises.push(request(commitOptions).then(results => {
+				let repo = {
+					total: results.length,
+					today: 0,
+					week: [0, 0, 0, 0, 0, 0, 0],
+				};
+				let dateTime = new DateTime(new Date(), format);
+				let sevenDays = [];
+				for (let i = 0; i < 7; i++) {
+					sevenDays[i] = dateTime.offsetInDays(-1 * i);
+				}
+				let weekCommits = [];
+				results.forEach(elem => {
+					let date = moment(elem.commit.committer.date).format(format);
+					let index = sevenDays.indexOf(date);
 					if (!weekCommits[index]) {
 						weekCommits[index] = [];
 					}
-					weekCommits[index].push(elem);
-				}
-			});
-			weekCommits.forEach((item, i) => {
-				payload.weekCommits[i] = item.length;
-			});
-			payload.weekCommits.reverse();
-			payload.commits = {
-				total: results.length
-			};
-		})
-	];
-	Promise.all(promises).then(() => {
+					if (index > -1) {
+						weekCommits[index].push(elem);
+					}
+				});
+				weekCommits.forEach((item, i) => {
+					repo.week[i] = item.length;
+					payload.commits.week[i] += repo.week[i];
+				});
+				repo.today = repo.week[0];
+				repo.week.reverse();
+				payload.commits.list[item.name] = repo;
+				payload.commits.total += repo.total;
+				payload.commits.today += repo.today;
+				debug(`${++n} finish repo:`, item.name);
+			}));
+			return item.name;
+		});
+		return Promise.all(promises);
+	}).then(() => {
+		payload.commits.week.reverse();
 		res.json(payload);
 		next();
 	}).catch(err => {

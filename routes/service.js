@@ -42,7 +42,7 @@ router.patch(SERVICES_API + 'squats/:id', handlers.Squats.update);
 router.del(SERVICES_API + 'squats/:id', handlers.Squats.delete);
 
 router.get(SERVICES_API + 'aggregation', handlers.Aggregation.query);
-router.get(SERVICES_API + 'aggregation/git', handlers.Aggregation.git);
+router.get(SERVICES_API + 'aggregation/git/:owner', handlers.Aggregation.git);
 
 module.exports = server => {
 	server.use(middleWares.InitProps);
