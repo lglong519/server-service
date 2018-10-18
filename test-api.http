@@ -184,3 +184,10 @@ x-serve: service
 x-access-token: {{accessToken}}
 
 ### aggregation ------
+
+
+### get aggregation
+GET {{api}}/weather/东莞
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}

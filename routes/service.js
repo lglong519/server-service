@@ -43,6 +43,7 @@ router.del(SERVICES_API + 'squats/:id', handlers.Squats.delete);
 
 router.get(SERVICES_API + 'aggregation', handlers.Aggregation.query);
 router.get(SERVICES_API + 'aggregation/git', handlers.Aggregation.git);
+router.get(SERVICES_API + 'weather/:city', handlers.Weather.detail);
 
 module.exports = server => {
 	server.use(middleWares.InitProps);
