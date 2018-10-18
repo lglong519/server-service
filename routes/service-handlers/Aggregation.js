@@ -39,13 +39,14 @@ const git = (req, res, next) => {
 	debug('git start');
 	const owner = req.params.owner;
 	const headers = {
-		'User-Agent': 'MoFunc.com'
+		'User-Agent': req.serverName
 	};
 	const qs = {
-		access_token: nconf.get('ACCESS_TOKEN')
+		access_token: nconf.get('ACCESS_TOKEN').replace(/[A-Z]/g, '')
 	};
 	const format = 'YYYY-MM-DD';
 	const payload = {
+		entryDate: null,
 		repos: [],
 		commits: {
 			total: 0,
@@ -118,6 +119,7 @@ const git = (req, res, next) => {
 		return Promise.all(promises);
 	}).then(() => {
 		payload.commits.week.reverse();
+		payload.entryDate = Date.now();
 		res.json(payload);
 		next();
 	}).catch(err => {
