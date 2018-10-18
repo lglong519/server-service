@@ -177,7 +177,7 @@ Content-Type: application/json
 x-serve: service
 x-access-token: {{accessToken}}
 
-### get aggregation
+### git aggregation
 GET {{api}}/aggregation/git/lglong519
 Content-Type: application/json
 x-serve: service
