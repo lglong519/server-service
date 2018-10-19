@@ -22,7 +22,7 @@ process.env.NODE_ENV = nconf.get('NODE_ENV');
 const server = restify.createServer({
 	name: require('package').name
 });
-server.server.setTimeout(300000);
+server.server.setTimeout(180000);
 
 const DATABASES = require('common/mongoose-connections');
 const corsMiddleware = require('restify-cors-middleware');

@@ -4,6 +4,8 @@ const DateTime = require('common/dateTime');
 const moment = require('moment');
 const debug = require('debug')('server:Aggregation');
 const nconf = require('nconf');
+const ProcessService = require('services/ProcessService');
+const localStorage = require('common/localStorage');
 
 nconf.required([
 	'ACCESS_TOKEN'
@@ -35,8 +37,29 @@ const query = (req, res, next) => {
 	});
 };
 
+/**
+ * @description 同一时间段内只允许一个处理进程,进程完成后缓存返回的数据,所有请求共享缓存的数据
+ */
 const git = (req, res, next) => {
 	debug('git start');
+	if (ProcessService.git.active) {
+		return ProcessService.git.async.then(() => {
+			res.json(localStorage.fetchItem(`git-cache-${req.params.owner}`));
+			next();
+		}).catch(() => {
+			_gitOnlineFecth(req, res, next);
+		});
+	}
+	let gitCache = localStorage.fetchItem(`git-cache-${req.params.owner}`);
+	if (Date.now() - new Date(gitCache.entryDate) < 600000) {
+		res.json(gitCache);
+		return next();
+	}
+	_gitOnlineFecth(req, res, next);
+};
+
+function _gitOnlineFecth (req, res, next) {
+	ProcessService.git.active = true;
 	const owner = req.params.owner;
 	const headers = {
 		'User-Agent': req.serverName
@@ -46,7 +69,7 @@ const git = (req, res, next) => {
 	};
 	const format = 'YYYY-MM-DD';
 	const payload = {
-		entryDate: null,
+		entryDate: 0,
 		repos: [],
 		commits: {
 			total: 0,
@@ -70,7 +93,7 @@ const git = (req, res, next) => {
 		headers,
 		json: true
 	};
-	request(reposOptions).then(results => {
+	ProcessService.git.async = request(reposOptions).then(results => {
 		debug('repos count:', results.length);
 		const promises = [];
 		let n = 0;
@@ -116,16 +139,25 @@ const git = (req, res, next) => {
 			}));
 			return item.name;
 		});
+		setTimeout(() => {
+			if (ProcessService.git.active) {
+				ProcessService.git.active = false;
+				next(Error('timeout'));
+			}
+		}, 180000);
 		return Promise.all(promises);
 	}).then(() => {
 		payload.commits.week.reverse();
 		payload.entryDate = Date.now();
+		localStorage.setItem(`git-cache-${req.params.owner}`, JSON.stringify(payload));
+		ProcessService.git.active = false;
 		res.json(payload);
 		next();
 	}).catch(err => {
+		ProcessService.git.active = false;
 		next(err);
 	});
-};
+}
 module.exports = {
 	query,
 	git,
