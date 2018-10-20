@@ -46,6 +46,12 @@ router.get(SERVICES_API + 'aggregation', handlers.Aggregation.query);
 router.get(SERVICES_API + 'aggregation/git/:owner', handlers.Aggregation.git);
 router.get(SERVICES_API + 'weather/:city', handlers.Weather.detail);
 
+router.post(SERVICES_API + 'expenses', handlers.Expenses.insert);
+router.get(SERVICES_API + 'expenses', handlers.Expenses.query);
+router.get(SERVICES_API + 'expenses/:id', handlers.Expenses.detail);
+router.patch(SERVICES_API + 'expenses/:id', handlers.Expenses.update);
+router.del(SERVICES_API + 'expenses/:id', handlers.Expenses.delete);
+
 module.exports = server => {
 	server.use(middleWares.InitProps);
 	publicRouter.applyRoutes(server);

@@ -120,17 +120,30 @@ function _gitOnlineFecth (req, res, next) {
 			let contributors;
 			promises.push(_processContributors(contributorsCacheName, contributorsOptions).then(results => {
 				// 如果 cts 是缓存数据,直接返回缓存 cms 数据
-				contributors = results;
-				payload.commits.total += contributors[0].contributions;
+				if (!results.results) {
+					contributors = {
+						entryDate: new Date(),
+						results
+					};
+				} else {
+					contributors = results;
+				}
+				payload.commits.total += contributors.results[0].contributions;
+				let commitsCache = localStorage.getItem(commitsCacheName);
 				if (contributors.cache) {
-					return localStorage.fetchItem(commitsCacheName, false);
+					if (commitsCache) {
+						return JSON.parse(commitsCache);
+					}
+					return request(commitOptions);
 				}
 				let oldData = localStorage.fetchItem(contributorsCacheName);
 				// 新 cts 数据重新缓存
-				localStorage.setItem(contributorsCacheName, JSON.stringify(results));
+				localStorage.setItem(contributorsCacheName, JSON.stringify(contributors));
 				// 判断 cms 是否有更新,如果没有更新直接返回缓存 cms
-				if (oldData[0].contributions == results[0].contributions) {
-					return localStorage.fetchItem(commitsCacheName, false);
+				if (oldData.results && oldData.results[0].contributions == contributors.results[0].contributions) {
+					if (commitsCache) {
+						return JSON.parse(commitsCache);
+					}
 				}
 				return request(commitOptions);
 			}).then(results => {
@@ -139,7 +152,7 @@ function _gitOnlineFecth (req, res, next) {
 					localStorage.setItem(commitsCacheName, JSON.stringify(results));
 				}
 				let repo = {
-					total: contributors[0].contributions,
+					total: contributors.results[0].contributions,
 					today: 0,
 					week: null,
 				};

@@ -1,5 +1,8 @@
 const restifyMongoose = require('restify-mongoose');
-const handler = restifyMongoose('PressUp');
+const handler = restifyMongoose('PressUp', {
+	pageSize: 10,
+	sort: '-createdAt'
+});
 
 module.exports = {
 	insert: handler.insert(),

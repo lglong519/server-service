@@ -26,7 +26,7 @@ class DateTime {
 			throw validate.error;
 		}
 		this._time = new Date(validate.value);
-		this.format = format;
+		this._format = format;
 		if (format) {
 			this.time = moment(this._time).format(format);
 		} else {
@@ -39,8 +39,8 @@ class DateTime {
 			throw validate.error;
 		}
 		this.time = new Date(this._time.getTime() + days * 24 * 60 * 60 * 1000);
-		if (this.format) {
-			this.time = moment(this.time).format(this.format);
+		if (this._format) {
+			this.time = moment(this.time).format(this._format);
 		}
 		return this.time;
 	}
@@ -50,8 +50,8 @@ class DateTime {
 			throw validate.error;
 		}
 		this.time = new Date(this._time.getTime() + hours * 60 * 60 * 1000);
-		if (this.format) {
-			this.time = moment(this.time).format(this.format);
+		if (this._format) {
+			this.time = moment(this.time).format(this._format);
 		}
 		return this.time;
 	}
@@ -61,8 +61,8 @@ class DateTime {
 			throw validate.error;
 		}
 		this.time = new Date(this._time.getTime() + minutes * 60 * 1000);
-		if (this.format) {
-			this.time = moment(this.time).format(this.format);
+		if (this._format) {
+			this.time = moment(this.time).format(this._format);
 		}
 		return this.time;
 	}
@@ -72,8 +72,8 @@ class DateTime {
 			throw validate.error;
 		}
 		this.time = new Date(this._time.getTime() + seconds * 1000);
-		if (this.format) {
-			this.time = moment(this.time).format(this.format);
+		if (this._format) {
+			this.time = moment(this.time).format(this._format);
 		}
 		return this.time;
 	}
@@ -82,8 +82,8 @@ class DateTime {
 		if (validate.error) {
 			throw validate.error;
 		}
-		this.format = pattern;
-		this.time = moment(this.time).format(this.format);
+		this._format = pattern;
+		this.time = moment(this.time).format(this._format);
 		return this.time;
 	}
 

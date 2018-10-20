@@ -1,5 +1,5 @@
 const restifyMongoose = require('restify-mongoose');
-const handler = restifyMongoose('Package', {
+const handler = restifyMongoose('Expense', {
 	pageSize: 10,
 	sort: '-createdAt'
 });
