@@ -1,14 +1,16 @@
 
 const request = require('request-promise');
 const DateTime = require('common/dateTime');
-const moment = require('moment');
 const debug = require('debug')('server:Aggregation');
 const nconf = require('nconf');
+const _ = require('lodash');
 const ProcessService = require('services/ProcessService');
 const localStorage = require('common/localStorage');
+const getWeekData = require('common/getWeekData');
 
 nconf.required([
-	'ACCESS_TOKEN'
+	'ACCESS_TOKEN',
+	'GIT_API',
 ]);
 
 const query = (req, res, next) => {
@@ -44,14 +46,14 @@ const git = (req, res, next) => {
 	debug('git start');
 	if (ProcessService.git.active) {
 		return ProcessService.git.async.then(() => {
-			res.json(localStorage.fetchItem(`git-cache-${req.params.owner}`));
+			res.json(localStorage.fetchItem(`git-cache_${req.params.owner}`));
 			next();
 		}).catch(() => {
 			_gitOnlineFecth(req, res, next);
 		});
 	}
-	let gitCache = localStorage.fetchItem(`git-cache-${req.params.owner}`);
-	if (Date.now() - new Date(gitCache.entryDate) < 600000) {
+	let gitCache = localStorage.fetchItem(`git-cache_${req.params.owner}`);
+	if (Date.now() - new Date(gitCache.entryDate) < 300000) {
 		res.json(gitCache);
 		return next();
 	}
@@ -61,13 +63,14 @@ const git = (req, res, next) => {
 function _gitOnlineFecth (req, res, next) {
 	ProcessService.git.active = true;
 	const owner = req.params.owner;
+	const GIT_API = nconf.get('GIT_API');
 	const headers = {
 		'User-Agent': req.serverName
 	};
 	const qs = {
 		access_token: nconf.get('ACCESS_TOKEN').replace(/[A-Z]/g, '')
 	};
-	const format = 'YYYY-MM-DD';
+	const since = new Date(`${new DateTime(new Date(), 'YYYY-MM-DD').offsetInDays(-6)} 00:00:00`).toISOString();
 	const payload = {
 		entryDate: 0,
 		repos: [],
@@ -88,73 +91,62 @@ function _gitOnlineFecth (req, res, next) {
 	};
 
 	const reposOptions = {
-		uri: `https://api.github.com/users/${owner}/repos`,
+		uri: `${GIT_API}/users/${owner}/repos`,
 		qs,
 		headers,
 		json: true
 	};
 	ProcessService.git.async = request(reposOptions).then(results => {
 		debug('repos count:', results.length);
+		debug('since:', since);
 		const promises = [];
 		let n = 0;
-		payload.repos = results.map((item, i) => {
-			const commitOptions = {
-				uri: `https://api.github.com/repos/${owner}/${item.name}/commits`,
+		payload.repos = results.map(item => {
+			const contributorsOptions = {
+				uri: `${GIT_API}/repos/${owner}/${item.name}/contributors`,
 				qs,
 				headers,
 				json: true
 			};
-			let storeName = `repo_${owner}_${item.name}`;
+			const commitOptions = {
+				uri: `${GIT_API}/repos/${owner}/${item.name}/commits?since=${since}`,
+				qs,
+				headers,
+				json: true
+			};
+			let contributorsCacheName = `${owner}_contributors_${item.name}`;
+			let commitsCacheName = `${owner}_commits_${item.name}`;
 			// 获取每个分支的缓存,如果时间不小于3:20,就重新获取
-			promises.push(localStorage.fetchItem(storeName, false).then(result => {
-				// 判断分支缓存时间
-				if (Date.now() - new Date(result.entryDate) < 200000) {
-					return result;
+			let contributors;
+			promises.push(_processContributors(contributorsCacheName, contributorsOptions).then(results => {
+				// 如果 cts 是缓存数据,直接返回缓存 cms 数据
+				contributors = results;
+				payload.commits.total += contributors[0].contributions;
+				if (contributors.cache) {
+					return localStorage.fetchItem(commitsCacheName, false);
+				}
+				let oldData = localStorage.fetchItem(contributorsCacheName);
+				// 新 cts 数据重新缓存
+				localStorage.setItem(contributorsCacheName, JSON.stringify(results));
+				// 判断 cms 是否有更新,如果没有更新直接返回缓存 cms
+				if (oldData[0].contributions == results[0].contributions) {
+					return localStorage.fetchItem(commitsCacheName, false);
 				}
 				return request(commitOptions);
 			}).then(results => {
-				// 判断是否缓存数据,只有缓存数据才有 results.results
-				let _eachData;
-				if (results.results) {
-					_eachData = results;
-				} else {
-					_eachData = {
-						entryDate: Date.now(),
-						results
-					};
-					// 新数据重新缓存
-					localStorage.setItem(storeName, JSON.stringify(_eachData));
+				if (!contributors.cache) {
+					// 新 cms 数据重新缓存
+					localStorage.setItem(commitsCacheName, JSON.stringify(results));
 				}
 				let repo = {
-					total: _eachData.results.length,
+					total: contributors[0].contributions,
 					today: 0,
-					week: [0, 0, 0, 0, 0, 0, 0],
+					week: null,
 				};
-				let dateTime = new DateTime(new Date(), format);
-				let sevenDays = [];
-				for (let i = 0; i < 7; i++) {
-					sevenDays[i] = dateTime.offsetInDays(-1 * i);
-				}
-				let weekCommits = [];
-				_eachData.results.forEach(elem => {
-					let date = moment(elem.commit.committer.date).format(format);
-					let index = sevenDays.indexOf(date);
-					if (!weekCommits[index]) {
-						weekCommits[index] = [];
-					}
-					if (index > -1) {
-						weekCommits[index].push(elem);
-					}
-				});
-				weekCommits.forEach((item, i) => {
-					repo.week[i] = item.length;
-					payload.commits.week[i] += repo.week[i];
-				});
-				repo.today = repo.week[0];
-				repo.week.reverse();
+				repo.week = getWeekData(results, 'commit.committer.date');
+				repo.today = repo.week[6];
+				payload.commits.week = _.zipWith(payload.commits.week, repo.week, (a, b) => a + b);
 				payload.commits.list[item.name] = repo;
-				payload.commits.total += repo.total;
-				payload.commits.today += repo.today;
 				debug(`${++n} finish repo:`, item.name);
 			}));
 			return item.name;
@@ -165,10 +157,9 @@ function _gitOnlineFecth (req, res, next) {
 				debug('git timeout');
 				next(Error('timeout'));
 			}
-		}, 180000);
+		}, 60000);
 		return Promise.all(promises);
 	}).then(() => {
-		payload.commits.week.reverse();
 		payload.entryDate = Date.now();
 		localStorage.setItem(`git-cache_${req.params.owner}`, JSON.stringify(payload));
 		ProcessService.git.active = false;
@@ -177,6 +168,17 @@ function _gitOnlineFecth (req, res, next) {
 	}).catch(err => {
 		ProcessService.git.active = false;
 		next(err);
+	});
+}
+
+function _processContributors (contributorsCacheName, options) {
+	return localStorage.fetchItem(contributorsCacheName, false).then(result => {
+		// 判断分支缓存时间
+		if (Date.now() - new Date(result.entryDate) < 300000) {
+			result.cache = true;
+			return result;
+		}
+		return request(options);
 	});
 }
 module.exports = {

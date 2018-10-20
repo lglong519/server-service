@@ -3,6 +3,7 @@ LocalStorage.prototype.fetchItem = function (item, async = true) {
 	let data = this.getItem(item);
 	if (!data) {
 		data = {
+			cache: true, // 判断数据的来源
 			entryDate: 0,
 			repos: [],
 			commits: {
