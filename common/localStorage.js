@@ -1,5 +1,5 @@
 const LocalStorage = require('node-localstorage').LocalStorage;
-LocalStorage.prototype.fetchItem = function (item) {
+LocalStorage.prototype.fetchItem = function (item, async = true) {
 	let data = this.getItem(item);
 	if (!data) {
 		data = {
@@ -16,7 +16,10 @@ LocalStorage.prototype.fetchItem = function (item) {
 	} else {
 		data = JSON.parse(data);
 	}
-	return data;
+	if (async) {
+		return data;
+	}
+	return Promise.resolve(data);
 };
 const localStorage = new LocalStorage('./.storage');
 module.exports = localStorage;

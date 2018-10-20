@@ -184,3 +184,8 @@ x-serve: service
 x-access-token: {{accessToken}}
 
 ### aggregation ------
+
+### test
+GET {{api}}/test
+Content-Type: application/json
+x-serve: service

@@ -8,7 +8,7 @@ const mainSchema = new Schema({
 	},
 	referenceDate: {
 		type: Date,
-		default: Date.now(),
+		default: Date.now,
 	}
 });
 

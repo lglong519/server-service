@@ -104,9 +104,29 @@ function _gitOnlineFecth (req, res, next) {
 				headers,
 				json: true
 			};
-			promises.push(request(commitOptions).then(results => {
+			let storeName = `repo_${owner}_${item.name}`;
+			// 获取每个分支的缓存,如果时间不小于3:20,就重新获取
+			promises.push(localStorage.fetchItem(storeName, false).then(result => {
+				// 判断分支缓存时间
+				if (Date.now() - new Date(result.entryDate) < 200000) {
+					return result;
+				}
+				return request(commitOptions);
+			}).then(results => {
+				// 判断是否缓存数据,只有缓存数据才有 results.results
+				let _eachData;
+				if (results.results) {
+					_eachData = results;
+				} else {
+					_eachData = {
+						entryDate: Date.now(),
+						results
+					};
+					// 新数据重新缓存
+					localStorage.setItem(storeName, JSON.stringify(_eachData));
+				}
 				let repo = {
-					total: results.length,
+					total: _eachData.results.length,
 					today: 0,
 					week: [0, 0, 0, 0, 0, 0, 0],
 				};
@@ -116,7 +136,7 @@ function _gitOnlineFecth (req, res, next) {
 					sevenDays[i] = dateTime.offsetInDays(-1 * i);
 				}
 				let weekCommits = [];
-				results.forEach(elem => {
+				_eachData.results.forEach(elem => {
 					let date = moment(elem.commit.committer.date).format(format);
 					let index = sevenDays.indexOf(date);
 					if (!weekCommits[index]) {
@@ -142,6 +162,7 @@ function _gitOnlineFecth (req, res, next) {
 		setTimeout(() => {
 			if (ProcessService.git.active) {
 				ProcessService.git.active = false;
+				debug('git timeout');
 				next(Error('timeout'));
 			}
 		}, 180000);
@@ -149,7 +170,7 @@ function _gitOnlineFecth (req, res, next) {
 	}).then(() => {
 		payload.commits.week.reverse();
 		payload.entryDate = Date.now();
-		localStorage.setItem(`git-cache-${req.params.owner}`, JSON.stringify(payload));
+		localStorage.setItem(`git-cache_${req.params.owner}`, JSON.stringify(payload));
 		ProcessService.git.active = false;
 		res.json(payload);
 		next();
