@@ -24,30 +24,15 @@ const insert = (req, res, next) => {
 		return next(new Errors.InvalidArgumentError(validate.error));
 	}
 	let params = validate.value;
-	Access(req).findOneAndUpdate({
-		action: params.action,
-		ip: params.ip,
-		host: params.host,
-	}, {
-		$inc: { inc: 1 }
-	}, {
-		new: true
-	}).exec().then(result => {
-		let options = _.omit(params, ['resources', 'referers', 'clients', 'bodies', 'inc']);
-		if (result) {
-			result.set(options);
-		} else {
-			result = Access(req)(options);
-		}
-		result.client = getClient(params.client);
-		let now = moment().format('YYYY-MM-DD HH:mm:SS');
-		processArr(result, 'resources', params.resource, now);
-		processArr(result, 'referers', params.referer, now);
-		processArr(result, 'clients', params.client, now);
-		processArr(result, 'bodies', params.body, now);
-		return result.save();
-	}).then(result => {
-		req.query.return === 'true' ? res.json(result) : res.send(204);
+
+	let options = _.omit(params, ['resources', 'referers', 'clients', 'bodies', 'inc']);
+
+	let access = Access(req)(options);
+	access.client = getClient(params.client);
+	let now = moment().format('YYYY-MM-DD HH:mm:SS');
+	processArr(access, 'clients', params.client, now);
+	access.save().then(result => {
+		req.query.return === '1' ? res.json(result) : res.send(204);
 		next();
 	}).catch(err => {
 		debug(req.body);

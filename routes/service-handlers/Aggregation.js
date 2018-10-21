@@ -7,6 +7,7 @@ const _ = require('lodash');
 const ProcessService = require('services/ProcessService');
 const localStorage = require('common/localStorage');
 const getWeekData = require('common/getWeekData');
+const reduceWeekData = require('common/reduceWeekData');
 
 nconf.required([
 	'ACCESS_TOKEN',
@@ -14,24 +15,99 @@ nconf.required([
 ]);
 
 const query = (req, res, next) => {
-	let payload = {};
+	let payload = {
+		// exercise,
+		// accesses,
+	};
+	const since = new Date(`${new DateTime(new Date(), 'YYYY-MM-DD').offsetInDays(-6)} 00:00:00`).toISOString();
+	let accesses = {};
+	let squats = {};
+	let pressUps = {};
+	let auditlogs = {};
+	let expenses = {
+		food: {},
+		general: {}
+	};
 	Promise.all([
+		// week
+		req.db.model('Expense').find({
+			type: 'food',
+			createdAt: {
+				$gte: since
+			}
+		}).exec().then(results => {
+			expenses.food.week = reduceWeekData(results, 'createdAt', 'amount');
+		}),
+		// week
+		req.db.model('Expense').find({
+			type: 'general',
+			createdAt: {
+				$gte: since
+			}
+		}).exec().then(results => {
+			expenses.general.week = reduceWeekData(results, 'createdAt', 'amount');
+		}),
+		// week
+		req.db.model('Auditlog').find({
+			time: {
+				$gte: since
+			}
+		}).exec().then(results => {
+			auditlogs.week = getWeekData(results, 'time');
+		}),
+		// week
+		req.db.model('Access').find({
+			updatedAt: {
+				$gte: since
+			}
+		}).exec().then(results => {
+			accesses.week = getWeekData(results, 'updatedAt', 'inc');
+		}),
+		// week
+		req.db.model('Squat').find({
+			referenceDate: {
+				$gte: since
+			}
+		}).exec().then(results => {
+			squats.week = reduceWeekData(results, 'referenceDate', 'count');
+		}),
+		// week
+		req.db.model('PressUp').find({
+			referenceDate: {
+				$gte: since
+			}
+		}).exec().then(results => {
+			pressUps.week = reduceWeekData(results, 'referenceDate', 'count');
+		}),
 		req.db.model('Access').aggregate([
 			{ $group: { _id: null, accesses: { $sum: '$inc' } } },
 		]).exec().then(reusult => {
-			Object.assign(payload, reusult[0]);
+			accesses.total = reusult[0].accesses;
 		}),
 		req.db.model('Squat').aggregate([
 			{ $group: { _id: null, squats: { $sum: '$count' } } },
 		]).exec().then(reusult => {
-			Object.assign(payload, reusult[0]);
+			squats.total = reusult[0].squats;
 		}),
 		req.db.model('PressUp').aggregate([
 			{ $group: { _id: null, pressUps: { $sum: '$count' } } },
 		]).exec().then(reusult => {
-			Object.assign(payload, reusult[0]);
+			pressUps.total = reusult[0].pressUps;
+		}),
+		req.db.model('Expense').aggregate([
+			{ $group: { _id: null, expenses: { $sum: '$amount' } } },
+		]).exec().then(reusult => {
+			expenses.total = reusult[0].expenses;
 		}),
 	]).then(() => {
+		payload.exercise = {
+			total: squats.total + pressUps.total,
+			squats,
+			pressUps,
+		};
+		payload.accesses = accesses;
+		payload.auditlogs = auditlogs;
+		payload.expenses = expenses;
 		res.json(payload);
 		next();
 	}).catch(err => {

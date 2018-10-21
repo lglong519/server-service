@@ -1552,8 +1552,10 @@ RotatingFileStream.prototype.write = function write(s) {
     } else {
 		try{
 			if(this.collection){
-				client.then(db=>{
-					db.collection(this.collection).insertOne(JSON.parse(s))
+				client.then(db => {
+					let data = JSON.parse(s);
+					data.time = new Date(data.time);
+					db.collection(this.collection).insertOne(data)
 				})
 			}
 		}catch(e){
