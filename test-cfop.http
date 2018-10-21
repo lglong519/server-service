@@ -1,0 +1,46 @@
+@api= http://127.0.0.1:50901/cfop
+# @api= http://dev.mofunc.com/services
+@accessToken= cH6ZaK5ufS7tV
+
+### f2ls ++++++
+
+### create
+POST {{api}}/f2ls
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}
+
+{
+	"number": 21,
+	"image":"no-image",
+	"formula":"RUR'U'"
+}
+
+### query f2ls
+GET {{api}}/f2ls
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}
+
+### get a f2l
+GET {{api}}/f2ls/5bc20639a612ec187856e111
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}
+
+### update a f2l
+PATCH  {{api}}/f2ls/5b8e55871cb0e6125a9c0314
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}
+
+{
+	"count": 30
+}
+
+### delete a f2l
+DELETE  {{api}}/f2ls/5b8e55111cb0e6125a9c0311
+Content-Type: application/json
+x-serve: service
+
+### f2ls ------

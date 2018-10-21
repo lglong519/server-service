@@ -41,6 +41,8 @@ const greetingRoutes = require('routes/greeting');
 greetingRoutes(server);
 const serviceRoutes = require('routes/service');
 serviceRoutes(server);
+const cfopRoutes = require('routes/cfop');
+cfopRoutes(server);
 
 server.listen(nconf.get('PORT'), () => {
 	debug('ready on \x1B[33m%s\x1B[39m ,NODE_ENV: \x1B[32m%s\x1B[39m ,localhost: \x1B[35m%s\x1B[39m', server.url, nconf.get('NODE_ENV'), localhost);
