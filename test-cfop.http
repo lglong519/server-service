@@ -1,5 +1,5 @@
 @api= http://127.0.0.1:50901/cfop
-# @api= http://dev.mofunc.com/services
+# @api= http://dev.mofunc.com/cfop
 @accessToken= cH6ZaK5ufS7tV
 
 ### f2ls ++++++
@@ -13,7 +13,15 @@ x-access-token: {{accessToken}}
 {
 	"number": 21,
 	"image":"no-image",
-	"formula":"RUR'U'"
+	"formula":"RUR'U'",
+	"tags":[{
+		"type": "primary",
+		"_id": "5bcc2e821a6f5c5f7a6b8eaa",
+		"label": "21",
+		"updatedAt": "2018-10-21T07:45:06.487Z",
+		"createdAt": "2018-10-21T07:45:06.487Z",
+		"__v": 0
+		}]
 }
 
 ### query f2ls
@@ -29,13 +37,14 @@ x-serve: service
 x-access-token: {{accessToken}}
 
 ### update a f2l
-PATCH  {{api}}/f2ls/5b8e55871cb0e6125a9c0314
+PATCH  {{api}}/f2ls/5bcc2eed1a6f5c5f7a6b8eac
 Content-Type: application/json
 x-serve: service
 x-access-token: {{accessToken}}
 
 {
-	"count": 30
+	"order": 30,
+	"tags":[]
 }
 
 ### delete a f2l

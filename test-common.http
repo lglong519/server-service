@@ -1,0 +1,45 @@
+@api= http://127.0.0.1:50901/common
+# @api= http://dev.mofunc.com/common
+@accessToken= cH6ZaK5ufS7tV
+
+### tags ++++++
+
+### create
+POST {{api}}/tags
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}
+
+{
+	"label": "21",
+	"type":"primary"
+}
+
+### query tags
+GET {{api}}/tags
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}
+
+### get a tag
+GET {{api}}/tags/5bc20639a612ec187856e111
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}
+
+### update a tag
+PATCH  {{api}}/tags/5b8e55871cb0e6125a9c0314
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}
+
+{
+	"label": 30
+}
+
+### delete a tag
+DELETE  {{api}}/tags/5b8e55111cb0e6125a9c0311
+Content-Type: application/json
+x-serve: service
+
+### tags ------

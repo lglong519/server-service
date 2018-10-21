@@ -16,6 +16,10 @@ const mainSchema = new Schema({
 		type: String,
 		default: '',
 	},
+	tags: [{
+		type: Schema.Types.ObjectId,
+		ref: 'Tag'
+	}],
 });
 
 module.exports = db => db.model('Expense', mainSchema, 'expenses');

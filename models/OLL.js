@@ -29,6 +29,10 @@ const mainSchema = new Schema({
 		type: String,
 		default: 'Orientation of last layer'
 	},
+	tags: [{
+		type: Schema.Types.ObjectId,
+		ref: 'Tag'
+	}],
 });
 
 module.exports = db => db.model('OLL', mainSchema, 'olls');

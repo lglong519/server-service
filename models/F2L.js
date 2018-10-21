@@ -29,6 +29,10 @@ const mainSchema = new Schema({
 		type: String,
 		default: 'First 2 layers'
 	},
+	tags: [{
+		type: Schema.Types.ObjectId,
+		ref: 'Tag'
+	}],
 });
 
 module.exports = db => db.model('F2L', mainSchema, 'f2ls');
