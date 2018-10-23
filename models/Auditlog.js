@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const mainSchema = new Schema({
-	/*
 	req: {
 		type: Schema.Types.Mixed,
 	},
+	/*
 	res: {
 		type: Schema.Types.Mixed,
 	},

@@ -14,6 +14,5 @@ router.patch(COMMON_API + 'tags/:id', handlers.Tags.update);
 router.del(COMMON_API + 'tags/:id', handlers.Tags.delete);
 
 module.exports = server => {
-	server.use(middleWares.InitProps);
 	router.applyRoutes(server);
 };

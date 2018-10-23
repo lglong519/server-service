@@ -26,6 +26,5 @@ router.patch(CFOP_API + 'plls/:id', handlers.PLLs.update);
 router.del(CFOP_API + 'plls/:id', handlers.PLLs.delete);
 
 module.exports = server => {
-	server.use(middleWares.InitProps);
 	router.applyRoutes(server);
 };
