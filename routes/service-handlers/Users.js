@@ -1,9 +1,17 @@
 const restifyMongoose = require('restify-mongoose');
 const Joi = require('joi');
+const _ = require('lodash');
 const regExp = require('common/regExp');
 const Errors = require('restify-errors');
 
-const handler = restifyMongoose('User');
+const projection = (req, model, cb) => {
+	cb(null, _.pick(model, ['_id', 'inc', 'username', 'client', 'email', 'phone', 'image', 'updatedAt', 'createdAt']));
+};
+
+const handler = restifyMongoose('User', {
+	listProjection: projection,
+	detailProjection: projection,
+});
 const beforeSave = (req, model, cb) => {
 	const schema = Joi.object().keys({
 		username: Joi.string().regex(regExp.account).required(),
