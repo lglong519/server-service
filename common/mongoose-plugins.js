@@ -1,10 +1,11 @@
 const Joi = require('joi');
+const _ = require('lodash');
 const nconf = require('nconf');
-
 const crypto = require('crypto');
 const ALGORITHM = 'aes-256-cbc';
 const MAGIC_PREFIX = 'ENC__';
 const CHECK_MAGIC_PREFIX = new RegExp(`^${MAGIC_PREFIX}`);
+const debug = require('debug')('server:mongoose-plugins');
 
 nconf.required(['ENC_KEY']);
 
@@ -23,8 +24,14 @@ const decrypt = (str, key, checkPrefix = false) => {
 	}
 	let prefixLength = checkPrefix ? MAGIC_PREFIX.length : 0;
 	const decipher = crypto.createDecipher(ALGORITHM, key);
-	let decrypted = decipher.update(str.slice(prefixLength), 'hex', 'utf8');
-	decrypted += decipher.final('utf8');
+	let decrypted;
+	try {
+		decrypted = decipher.update(str.slice(prefixLength, prefixLength + 32), 'hex', 'utf8');
+		decrypted += decipher.final('utf8');
+	} catch (e) {
+		debug(_.get(e, 'message') || 'UNKNOWN ERROR');
+		decrypted = _.get(e, 'message') || 'UNKNOWN ERROR';
+	}
 	return decrypted;
 };
 

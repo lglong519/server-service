@@ -35,7 +35,7 @@ nconf.required([
 	'DATABASES:service'
 ]);
 let client=new Promise((res,rej)=>{
-	MongoClient.connect(nconf.get('MONGO_URI'), function(err, client) {
+	MongoClient.connect(nconf.get('MONGO_URI'), {useNewUrlParser:true}, function(err, client) {
 		if (err) {
 			debug(err);
 			return rej(err);
