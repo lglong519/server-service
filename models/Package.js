@@ -14,7 +14,7 @@ const mainSchema = new Schema({
 	},
 	link: {
 		type: String,
-		required: true,
+		// required: true,
 	},
 	isActive: {
 		type: Boolean,

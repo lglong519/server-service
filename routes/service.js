@@ -52,6 +52,17 @@ router.get(SERVICES_API + 'expenses/:id', handlers.Expenses.detail);
 router.patch(SERVICES_API + 'expenses/:id', handlers.Expenses.update);
 router.del(SERVICES_API + 'expenses/:id', handlers.Expenses.delete);
 
+router.post(SERVICES_API + 'entertainments', handlers.Entertainments.insert);
+router.get(SERVICES_API + 'entertainments', handlers.Entertainments.query);
+router.get(SERVICES_API + 'entertainments/:id', handlers.Entertainments.detail);
+router.patch(SERVICES_API + 'entertainments/:id', handlers.Entertainments.update);
+router.del(SERVICES_API + 'entertainments/:id', handlers.Entertainments.delete);
+
+router.post(SERVICES_API + 'favorites', handlers.Favorites.insert);
+router.get(SERVICES_API + 'favorites', handlers.Favorites.query);
+router.get(SERVICES_API + 'favorites/:id', handlers.Favorites.detail);
+router.patch(SERVICES_API + 'favorites/:id', handlers.Favorites.update);
+router.del(SERVICES_API + 'favorites/:id', handlers.Favorites.delete);
 module.exports = server => {
 	server.use(middleWares.InitProps);
 	publicRouter.applyRoutes(server);
