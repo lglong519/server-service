@@ -17,7 +17,7 @@ const mainSchema = new Schema({
 	},
 	type: {
 		type: String,
-		enum: ['music', 'article', 'movie', 'fiction', 'novel'],
+		enum: ['music', 'article', 'movie', 'fiction', 'novel', 'variety', 'series'],
 		required: true,
 	},
 	status: {

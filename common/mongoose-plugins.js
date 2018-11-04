@@ -26,7 +26,7 @@ const decrypt = (str, key, checkPrefix = false) => {
 	const decipher = crypto.createDecipher(ALGORITHM, key);
 	let decrypted;
 	try {
-		decrypted = decipher.update(str.slice(prefixLength, prefixLength + 32), 'hex', 'utf8');
+		decrypted = decipher.update(str.slice(prefixLength), 'hex', 'utf8');
 		decrypted += decipher.final('utf8');
 	} catch (e) {
 		debug(_.get(e, 'message') || 'UNKNOWN ERROR');

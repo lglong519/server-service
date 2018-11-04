@@ -11,13 +11,14 @@ const mainSchema = new Schema({
 	},
 	email: {
 		type: String,
-		required: true,
 		unique: true,
+		sparse: true,
 		index: true,
 	},
 	phone: {
 		type: String,
 		unique: true,
+		sparse: true,
 		index: true,
 	},
 	password: {
