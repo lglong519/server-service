@@ -42,6 +42,12 @@ router.get(SERVICES_API + 'squats/:id', handlers.Squats.detail);
 router.patch(SERVICES_API + 'squats/:id', handlers.Squats.update);
 router.del(SERVICES_API + 'squats/:id', handlers.Squats.delete);
 
+router.post(SERVICES_API + 'waists', handlers.Waists.insert);
+router.get(SERVICES_API + 'waists', handlers.Waists.query);
+router.get(SERVICES_API + 'waists/:id', handlers.Waists.detail);
+router.patch(SERVICES_API + 'waists/:id', handlers.Waists.update);
+router.del(SERVICES_API + 'waists/:id', handlers.Waists.delete);
+
 router.get(SERVICES_API + 'aggregation', handlers.Aggregation.query);
 router.get(SERVICES_API + 'aggregation/git/:owner', handlers.Aggregation.git);
 router.get(SERVICES_API + 'weather/:city', handlers.Weather.detail);

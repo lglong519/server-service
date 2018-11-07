@@ -53,6 +53,7 @@ const query = (req, res, next) => {
 				$gte: since
 			}
 		}).exec().then(results => {
+			auditlogs.total = results.length;
 			auditlogs.week = getWeekData(results, 'time');
 		}),
 		// week
@@ -61,6 +62,7 @@ const query = (req, res, next) => {
 				$gte: since
 			}
 		}).exec().then(results => {
+			accesses.total = results.length;
 			accesses.week = getWeekData(results, 'updatedAt', 'inc');
 		}),
 		// week
@@ -79,11 +81,11 @@ const query = (req, res, next) => {
 		}).exec().then(results => {
 			pressUps.week = reduceWeekData(results, 'referenceDate', 'count');
 		}),
-		req.db.model('Access').aggregate([
-			{ $group: { _id: null, accesses: { $sum: '$inc' } } },
-		]).exec().then(reusult => {
-			accesses.total = _.get(reusult, '[0].accesses') || 0;
-		}),
+		// req.db.model('Access').aggregate([
+		// 	{ $group: { _id: null, accesses: { $sum: '$inc' } } },
+		// ]).exec().then(reusult => {
+		// 	accesses.total = _.get(reusult, '[0].accesses') || 0;
+		// }),
 		req.db.model('Squat').aggregate([
 			{ $group: { _id: null, squats: { $sum: '$count' } } },
 		]).exec().then(reusult => {
@@ -99,16 +101,15 @@ const query = (req, res, next) => {
 		]).exec().then(reusult => {
 			expenses.total = _.get(reusult, '[0].expenses') || 0;
 		}),
-		req.db.model('Auditlog').countDocuments({}).exec().then(count => {
-			auditlogs.total = count;
-		}),
+		// req.db.model('Auditlog').countDocuments({}).exec().then(count => {
+		// 	auditlogs.total = count;
+		// }),
 	]).then(() => {
 		payload.exercise = {
 			total: squats.total + pressUps.total,
 			squats,
 			pressUps,
 		};
-		auditlogs.week = _.zipWith(auditlogs.week, accesses.week, (a, b) => a - b);
 		payload.accesses = accesses;
 		payload.auditlogs = auditlogs;
 		payload.expenses = expenses;
