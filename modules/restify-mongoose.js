@@ -440,9 +440,11 @@ Resource.prototype.remove = function () {
 	};
 };
 
-Resource.prototype.delete = function () {
+Resource.prototype.delete = function (options) {
 	const self = this;
 	const emitDelete = emitEvent(self, 'delete');
+	options = options || {};
+	options.beforeDelete = options.beforeDelete || this.options.beforeDelete;
 
 	return function (req, res, next) {
 		const find = {};
@@ -455,29 +457,29 @@ Resource.prototype.delete = function () {
 		if (self.options.filter) {
 			query = query.where(self.options.filter(req, res));
 		}
-
-		query.exec((err, model) => {
-			if (err) {
-				return next(err);
-			}
-
+		let model
+		query.exec().then(result => {
+			model = result;
 			if (!model) {
 				return next(new restifyErrors.ResourceNotFoundError(req.params.id));
 			}
-
-			req.db.model('RecycleBin').create({
+			if (options.beforeDelete) {
+				return options.beforeDelete(req, model);
+			}
+		}).then(() => {
+			return req.db.model('RecycleBin').create({
 				model: self.Model.modelName,
 				id: model._id,
 				data: model
-			}).then(result => {
-				return model.remove();
-			}).then(result => {
-				res.send(200, model);
-				emitDelete(model, next);
-				next();
-			}).catch(err => {
-				next(err);
-			});
+			})
+		}).then(result => {
+			return model.remove();
+		}).then(result => {
+			res.send(200, model);
+			emitDelete(model, next);
+			next();
+		}).catch(err => {
+			next(err);
 		});
 	};
 };

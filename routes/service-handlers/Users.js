@@ -38,12 +38,17 @@ const beforeSave = (req, model, cb) => {
 	}).catch(err => {
 		cb(err);
 	});
-
+};
+const beforeDelete = (req, model) => {
+	if (String(req.session.user) == String(model._id)) {
+		return Promise.reject(Error('cannot delete current user'));
+	}
+	return Promise.resolve();
 };
 module.exports = {
 	insert: handler.insert({ beforeSave }),
 	query: handler.query(),
 	detail: handler.detail(),
 	update: handler.update(),
-	delete: handler.delete(),
+	delete: handler.delete({ beforeDelete }),
 };

@@ -37,6 +37,10 @@ const mainSchema = new Schema({
 	data: {
 		type: Schema.Types.Mixed,
 	},
+	user: {
+		type: Schema.Types.ObjectId,
+		ref: 'User'
+	},
 });
 
 module.exports = db => db.model('Favorite', mainSchema, 'favorites');

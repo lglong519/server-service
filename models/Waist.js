@@ -9,7 +9,11 @@ const mainSchema = new Schema({
 	referenceDate: {
 		type: Date,
 		default: Date.now,
-	}
+	},
+	user: {
+		type: Schema.Types.ObjectId,
+		ref: 'User'
+	},
 });
 
 module.exports = db => db.model('Waist', mainSchema, 'waists');
