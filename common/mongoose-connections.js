@@ -45,9 +45,13 @@ module.exports = {
 		req.db = null;
 		let { 'x-serve': serve } = req.headers;
 		if (!serve) {
-			serve = 'pass';
-			req.session.pass = true;
-			console.error(`\x1B[31mInvalid x-serve:${serve}\x1B[39m`);
+			if (req.method === 'GET' && req.query.db) {
+				serve = req.query.db;
+			} else {
+				serve = 'pass';
+				req.session.pass = true;
+				console.error(`\x1B[31mInvalid x-serve:${serve}\x1B[39m`);
+			}
 		}
 		req.db = req.dbs[serve];
 		if (!req.db) {

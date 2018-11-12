@@ -65,6 +65,7 @@ router.patch(SERVICES_API + 'entertainments/:id', handlers.Entertainments.update
 router.del(SERVICES_API + 'entertainments/:id', handlers.Entertainments.delete);
 
 router.post(SERVICES_API + 'favorites', handlers.Favorites.insert);
+publicRouter.get(SERVICES_API + 'favorite', handlers.Favorites.insert);
 router.get(SERVICES_API + 'favorites', handlers.Favorites.query);
 router.get(SERVICES_API + 'favorites/:id', handlers.Favorites.detail);
 router.patch(SERVICES_API + 'favorites/:id', handlers.Favorites.update);
