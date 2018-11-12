@@ -4,7 +4,8 @@ const Schema = mongoose.Schema;
 const mainSchema = new Schema({
 	title: {
 		type: String,
-		required: true,
+		// required: true,
+		sparse: true,
 		index: true,
 	},
 	description: {
@@ -13,7 +14,8 @@ const mainSchema = new Schema({
 	},
 	type: {
 		type: String,
-		enum: ['music', 'article', 'movie', 'fiction', 'novel', 'ev'],
+		enum: ['default', 'music', 'article', 'movie', 'fiction', 'novel', 'ev'],
+		default: 'default'
 	},
 	status: {
 		type: String,
