@@ -12,6 +12,7 @@ publicRouter.get(SERVICES_API + 'access-tokens', handlers.AccessTokens.check);
 publicRouter.get(SERVICES_API + 'packages', handlers.Packages.query);
 publicRouter.get(SERVICES_API + 'packages/:id', handlers.Packages.detail);
 publicRouter.get(SERVICES_API + 'test', handlers.Test);
+publicRouter.post(SERVICES_API + 'test', handlers.Test);
 
 const router = new RestifyRouter();
 router.use(middleWares.initToken);
