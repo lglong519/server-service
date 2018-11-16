@@ -1,0 +1,78 @@
+@api= http://127.0.0.1:50901/tieba
+# @api= http://dev.mofunc.com/tieba
+@accessToken= cH6ZaK5ufS7tV
+
+### tieba-accounts ++++++
+
+### create
+POST {{api}}/tieba-accounts
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}
+
+{
+	"account": "y10824",
+	"BDUSS":"BDUSS"
+}
+
+### query tieba-accounts
+GET {{api}}/tieba-accounts
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}
+
+### get a tieba-account
+GET {{api}}/tieba-accounts/5bc20639a612ec187856e111
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}
+
+### update a tieba-account
+PATCH  {{api}}/tieba-accounts/5beec817eed780512e483146
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}
+
+{
+	"BDUSS": "V0WFJiQVdkVVo3ZDN"
+}
+
+### delete a tieba-account
+DELETE  {{api}}/tieba-accounts/5b8e55111cb0e6125a9c0311
+Content-Type: application/json
+x-serve: service
+
+
+### sign a tieba-account
+POST {{api}}/tieba-accounts/5beec817eed780512e483146/sign
+Content-Type: application/json
+x-serve: service
+
+### sumarize a tieba-account
+GET {{api}}/tieba-accounts/5beec817eed780512e483146/sumarize
+Content-Type: application/json
+x-serve: service
+### tieba-accounts ------
+
+
+### sync
+POST {{api}}/tiebas/sync
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}
+
+{
+	"account":"y10824"
+}
+
+### get tiebas
+GET {{api}}/tiebas
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}
+
+### sign one
+POST {{api}}/tiebas/5beec821eed780512e483182/sign
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}

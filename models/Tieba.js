@@ -38,6 +38,10 @@ const mainSchema = new Schema({
 	avatar: {
 		type: String,
 	},
+	void: {
+		type: Boolean,
+		default: false
+	},
 });
 
 module.exports = db => db.model('Tieba', mainSchema, 'tiebas');

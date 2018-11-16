@@ -5,14 +5,15 @@ const debug = require('debug')('server:TiebaService');
 
 class Tieba {
 
-	constructor (req, page_size = 500) {
+	constructor (req, { account, page_size = 500 } = {}) {
 		this.req = req;
 		this.page_size = page_size;
+		this.account = account;
 	}
 	/**
 	 * @description get userid from baidu,save to dbs
 	 */
-	init (account, BDUSS) {
+	init ({ account, BDUSS }) {
 		return request({
 			uri: `http://tieba.baidu.com/home/get/panel?ie=utf-8&un=${account}`,
 			json: true,
@@ -38,13 +39,13 @@ class Tieba {
 			throw result;
 		}).then(result => {
 			this.tiebaAccount = result;
-			return this._getAll();
+			return result;
 		});
 	}
 	/**
 	 * @description get tiebas from baidu,save to dbs
 	 */
-	_getAll () {
+	getAll () {
 		let now = Date.now();
 		let options = {
 			method: 'POST',
@@ -111,8 +112,12 @@ class Tieba {
 		if (this.tiebaAccount) {
 			return Promise.resolve();
 		}
+		if (!this.account) {
+			return Promise.reject('invalid account');
+		}
 		return this.req.db.model('TiebaAccount').findOne({
-			user: this.req.session.user
+			user: this.req.session.user,
+			account: this.account
 		}).exec().then(result => {
 			if (!result) {
 				throw Error('ERROR_NOT_FOUND');
@@ -130,7 +135,10 @@ class Tieba {
 		return this.getAccount().then(() => {
 			return this.req.db.model('Tieba').find({
 				user: this.req.session.user,
-				tiebaAccount: this.tiebaAccount._id
+				tiebaAccount: this.tiebaAccount._id,
+				void: {
+					$ne: true
+				}
 			}).exec();
 		}).then(result => {
 			this.tiebas = result;
@@ -162,6 +170,9 @@ class Tieba {
 	 * @returns void
 	 */
 	signOne (tieba) {
+		if (tieba.status == 'resolve' || tieba.void) {
+			return Promise.resolve(tieba);
+		}
 		let options = {
 			method: 'POST',
 			uri: 'http://c.tieba.baidu.com/c/c/forum/sign?',
@@ -171,7 +182,7 @@ class Tieba {
 			},
 			json: true
 		};
-		this.getTbs().then(result => {
+		return this.getTbs().then(result => {
 			let params = {
 				'BDUSS': this.tiebaAccount.BDUSS,
 				'fid': tieba.fid,
@@ -181,11 +192,12 @@ class Tieba {
 			options.uri += this._serialize(params);
 			return request(options);
 		}).then(result => {
-			if (result.error_code != '0') {
+			if (result.error_code != '0' && result.error_code != '160002') {
 				throw result;
 			}
+
 			tieba.status = 'resolve';
-			tieba.desc = '';
+			tieba.desc = result.error_msg || '';
 			return tieba.save();
 		}).catch(err => {
 			tieba.status = 'reject';
@@ -198,7 +210,7 @@ class Tieba {
 	 * @description sign all
 	 */
 	signAll () {
-		this.query().then(() => {
+		return this.query().then(() => {
 			this.tiebas.forEach(item => {
 				this.signOne(item);
 			});
