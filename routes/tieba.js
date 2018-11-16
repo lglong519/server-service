@@ -15,7 +15,7 @@ router.del(TB_API + 'tieba-accounts/:id', handlers.TiebaAccounts.delete);
 router.post(TB_API + 'tieba-accounts/:id/sign', handlers.TiebaAccounts.sign);
 router.get(TB_API + 'tieba-accounts/:id/sumarize', handlers.TiebaAccounts.sumarize);
 
-router.post(TB_API + 'tiebas/sync', handlers.Tiebas.sync);
+router.post(TB_API + 'tieba-accounts/:id/tiebas/sync', handlers.Tiebas.sync);
 router.post(TB_API + 'tiebas', handlers.Tiebas.insert);
 router.get(TB_API + 'tiebas', handlers.Tiebas.query);
 router.get(TB_API + 'tiebas/:id', handlers.Tiebas.detail);

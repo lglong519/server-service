@@ -6,7 +6,7 @@ const Errors = require('restify-errors');
 
 const handler = restifyMongoose('Tieba', {
 	pageSize: 10,
-	sort: '-createdAt'
+	sort: '-cur_score'
 });
 
 const insert = (req, res, next) => {
@@ -14,18 +14,12 @@ const insert = (req, res, next) => {
 };
 
 const sync = (req, res, next) => {
-	const schema = Joi.object().keys({
-		account: Joi.string().required(),
-	}).required();
-	const validate = Joi.validate(req.body, schema);
-	if (validate.error) {
-		debug(validate.error);
-		return next(new Errors.InvalidArgumentError(validate.error));
-	}
-	let params = validate.value;
-
-	let tb = new TiebaService(req, params);
-	tb.getAccount().then(() => {
+	let tb = new TiebaService(req);
+	req.db.model('TiebaAccount').findById(req.params.id).exec().then(result => {
+		if (!result) {
+			throw Error('ERR_TIEBA_ACCOUNT_NOT_FOUND');
+		}
+		tb.tiebaAccount = result;
 		tb.getAll();
 		res.send(204);
 		next();
@@ -37,16 +31,12 @@ const sync = (req, res, next) => {
 
 const sign = (req, res, next) => {
 	let tb = new TiebaService(req);
-	let tieba;
 	req.db.model('Tieba').findById(req.params.id).populate('tiebaAccount').then(result => {
 		if (!result) {
 			throw Error('ERR_TIEBA_NOT_FOUND');
 		}
-		tieba = result;
-		tb.account = result.tiebaAccount.account;
-		return tb.getAccount();
-	}).then(() => {
-		return tb.signOne(tieba);
+		tb.tiebaAccount = result.tiebaAccount;
+		return tb.signOne(result);
 	}).then(result => {
 		res.json(result);
 		next();

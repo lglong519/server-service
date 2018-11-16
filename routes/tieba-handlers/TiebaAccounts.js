@@ -6,14 +6,14 @@ const Errors = require('restify-errors');
 
 const handler = restifyMongoose('TiebaAccount', {
 	pageSize: 10,
-	sort: '-cur_score',
+	sort: '-createdAt',
 });
 
 const insert = (req, res, next) => {
 	const schema = Joi.object().keys({
 		account: Joi.string().required(),
 		BDUSS: Joi.string().required(),
-	}).required();
+	}).unknown().required();
 	const validate = Joi.validate(req.body, schema);
 	if (validate.error) {
 		debug(validate.error);
@@ -74,7 +74,9 @@ const sumarize = (req, res, next) => {
 			info.void = results.length;
 		}),
 		query().where({
-			status: 'pendding',
+			status: {
+				$in: ['pendding', undefined]
+			},
 			void: {
 				$ne: true
 			}

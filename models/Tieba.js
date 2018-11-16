@@ -23,24 +23,26 @@ const mainSchema = new Schema({
 	status: {
 		type: String,
 		enum: ['pendding', 'resolve', 'reject'],
-		default: 'pendding'
+		default: 'pendding',
+		required: true,
 	},
 	desc: {
 		type: String,
 		default: '',
 	},
 	level_id: {
-		type: String,
+		type: Number,
 	},
 	cur_score: {
-		type: String,
+		type: Number,
 	},
 	avatar: {
 		type: String,
 	},
 	void: {
 		type: Boolean,
-		default: false
+		default: false,
+		required: true,
 	},
 });
 

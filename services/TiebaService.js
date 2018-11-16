@@ -5,17 +5,19 @@ const debug = require('debug')('server:TiebaService');
 
 class Tieba {
 
-	constructor (req, { account, page_size = 500 } = {}) {
+	constructor (req, { account, page_size = 200 } = {}) {
 		this.req = req;
 		this.page_size = page_size;
 		this.account = account;
+		this.pn = 1;
+		this.tiebas = [];
 	}
 	/**
 	 * @description get userid from baidu,save to dbs
 	 */
 	init ({ account, BDUSS }) {
 		return request({
-			uri: `http://tieba.baidu.com/home/get/panel?ie=utf-8&un=${account}`,
+			uri: `http://tieba.baidu.com/home/get/panel?ie=utf-8&un=${encodeURIComponent(account)}`,
 			json: true,
 		}).then(result => {
 			if (result.no == 0) {
@@ -65,7 +67,7 @@ class Tieba {
 			'from': 'baidu_appstore',
 			'is_guest': 1,
 			'model': 'H60-L01',
-			'page_no': 1,
+			'page_no': this.pn,
 			'page_size': this.page_size,
 			'timestamp': `${now}903`,
 			'uid': this.tiebaAccount.uid
@@ -77,6 +79,10 @@ class Tieba {
 			let forum_list = result.forum_list['non-gconforum'];
 			if (result.error_code != '0' || !forum_list) {
 				throw result;
+			}
+			if (result.has_more == '1') {
+				this.pn++;
+				this.getAll();
 			}
 			let promises = forum_list.map(item => {
 				return this.req.db.model('Tieba').findOneAndUpdate(
@@ -102,7 +108,7 @@ class Tieba {
 			});
 			return Promise.all(promises);
 		}).then(results => {
-			this.tiebas = results;
+			this.tiebas = this.tiebas.concat(results);
 		});
 	}
 	/**
@@ -129,7 +135,7 @@ class Tieba {
 	 * @description query tiebas from dbs
 	 */
 	query () {
-		if (this.tiebas) {
+		if (this.tiebas && this.tiebas.length) {
 			return Promise.resolve();
 		}
 		return this.getAccount().then(() => {
