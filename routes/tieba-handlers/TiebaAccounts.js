@@ -20,7 +20,7 @@ const insert = (req, res, next) => {
 		return next(new Errors.InvalidArgumentError(validate.error));
 	}
 	let params = validate.value;
-	let tb = new TiebaService(req);
+	let tb = new TiebaService({ db: req.db, user: req.session.user });
 	tb.init(params).then(result => {
 		res.json(result);
 		next();
@@ -38,7 +38,7 @@ const beforeDelete = (req, model) => {
 
 const sign = (req, res, next) => {
 	debug('start to sign all');
-	let tb = new TiebaService(req);
+	let tb = new TiebaService({ db: req.db, user: req.session.user });
 	req.db.model('TiebaAccount').findById(req.params.id).exec().then(result => {
 		if (!result) {
 			throw Error('ERR_TIEBA_ACCOUNT_NOT_FOUND');

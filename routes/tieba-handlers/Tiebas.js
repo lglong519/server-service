@@ -14,7 +14,7 @@ const insert = (req, res, next) => {
 };
 
 const sync = (req, res, next) => {
-	let tb = new TiebaService(req);
+	let tb = new TiebaService({ db: req.db, user: req.session.user });
 	req.db.model('TiebaAccount').findById(req.params.id).exec().then(result => {
 		if (!result) {
 			throw Error('ERR_TIEBA_ACCOUNT_NOT_FOUND');
@@ -30,7 +30,7 @@ const sync = (req, res, next) => {
 };
 
 const sign = (req, res, next) => {
-	let tb = new TiebaService(req);
+	let tb = new TiebaService({ db: req.db, user: req.session.user });
 	req.db.model('Tieba').findById(req.params.id).populate('tiebaAccount').then(result => {
 		if (!result) {
 			throw Error('ERR_TIEBA_NOT_FOUND');

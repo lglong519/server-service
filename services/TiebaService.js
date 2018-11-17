@@ -5,8 +5,9 @@ const debug = require('debug')('server:TiebaService');
 
 class Tieba {
 
-	constructor (req, { account, page_size = 200 } = {}) {
-		this.req = req;
+	constructor ({ db, user, account, page_size = 200 } = {}) {
+		this.db = db;
+		this.user = user;
 		this.page_size = page_size;
 		this.account = account;
 		this.pn = 1;
@@ -21,13 +22,13 @@ class Tieba {
 			json: true,
 		}).then(result => {
 			if (result.no == 0) {
-				return this.req.db.model('TiebaAccount').findOneAndUpdate(
+				return this.db.model('TiebaAccount').findOneAndUpdate(
 					{
-						user: this.req.session.user,
+						user: this.user,
 						account: result.data.name
 					},
 					{
-						user: this.req.session.user,
+						user: this.user,
 						account: result.data.name,
 						uid: result.data.id,
 						BDUSS
@@ -85,14 +86,14 @@ class Tieba {
 				this.getAll();
 			}
 			let promises = forum_list.map(item => {
-				return this.req.db.model('Tieba').findOneAndUpdate(
+				return this.db.model('Tieba').findOneAndUpdate(
 					{
-						user: this.req.session.user,
+						user: this.user,
 						tiebaAccount: this.tiebaAccount._id,
 						fid: item.id,
 					},
 					{
-						user: this.req.session.user,
+						user: this.user,
 						tiebaAccount: this.tiebaAccount._id,
 						fid: item.id,
 						kw: item.name,
@@ -121,8 +122,8 @@ class Tieba {
 		if (!this.account) {
 			return Promise.reject('invalid account');
 		}
-		return this.req.db.model('TiebaAccount').findOne({
-			user: this.req.session.user,
+		return this.db.model('TiebaAccount').findOne({
+			user: this.user,
 			account: this.account
 		}).exec().then(result => {
 			if (!result) {
@@ -139,8 +140,8 @@ class Tieba {
 			return Promise.resolve();
 		}
 		return this.getAccount().then(() => {
-			return this.req.db.model('Tieba').find({
-				user: this.req.session.user,
+			return this.db.model('Tieba').find({
+				user: this.user,
 				tiebaAccount: this.tiebaAccount._id,
 				void: {
 					$ne: true
@@ -150,7 +151,28 @@ class Tieba {
 			this.tiebas = result;
 		});
 	}
-
+	/**
+	 * @description query unsigned from dbs
+	 */
+	queryPending () {
+		if (this.tiebas && this.tiebas.length) {
+			return Promise.resolve();
+		}
+		return this.getAccount().then(() => {
+			return this.db.model('Tieba').find({
+				status: {
+					$ne: 'resolve'
+				},
+				user: this.user,
+				tiebaAccount: this.tiebaAccount._id,
+				void: {
+					$ne: true
+				}
+			}).exec();
+		}).then(result => {
+			this.tiebas = result;
+		});
+	}
 	/**
 	 * @description get tbs for sign
 	 */
@@ -192,7 +214,7 @@ class Tieba {
 			let params = {
 				'BDUSS': this.tiebaAccount.BDUSS,
 				'fid': tieba.fid,
-				'kw': encodeURI(tieba.kw),
+				'kw': encodeURIComponent(tieba.kw),
 				'tbs': result.tbs,
 			};
 			options.uri += this._serialize(params);
@@ -216,9 +238,25 @@ class Tieba {
 	 * @description sign all
 	 */
 	signAll () {
-		return this.query().then(() => {
+		return this.queryPending().then(() => {
 			this.tiebas.forEach(item => {
 				this.signOne(item);
+			});
+		}).catch(err => {
+			debug(err);
+		});
+	}
+	/**
+	 * @description reset all tbs status
+	 */
+	resetAll () {
+		return this.query().then(() => {
+			this.tiebas.forEach(item => {
+				item.status = 'pendding';
+				item.desc = '';
+				item.save().catch(err => {
+					debug(`reset fail:${item._id}`, err);
+				});
 			});
 		}).catch(err => {
 			debug(err);
@@ -232,7 +270,7 @@ class Tieba {
 		Object.keys(params).forEach(item => {
 			query += `${item}=${params[item]}&`;
 		});
-		let sign = md5(`${decodeURI(query.replace(/&/g, ''))}tiebaclient!!!`).toUpperCase();
+		let sign = md5(`${decodeURIComponent(query.replace(/&/g, ''))}tiebaclient!!!`).toUpperCase();
 		return `${query}sign=${sign}`;
 	}
 

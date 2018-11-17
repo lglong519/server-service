@@ -2,7 +2,13 @@
 	"apps": [
 		{
 			"name": "service",
-			"script": "./index.js"
+			"script": "./index.js",
+			"max_restarts": 15
+		},
+		{
+			"name": "sign",
+			"script": "./scripts/sign.js",
+			"max_restarts": 15
 		}
 	]
 }
