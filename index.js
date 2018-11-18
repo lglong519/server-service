@@ -1,6 +1,7 @@
 const restify = require('restify');
 const nconf = require('nconf');
 const debug = require('debug')('server:index');
+const CookieParser = require('restify-cookies');
 require('debug').enable('*,-morgan');
 
 require('app-module-path').addPath(__dirname);
@@ -33,6 +34,7 @@ server.use(restify.plugins.acceptParser(server.acceptable));
 server.use(restify.plugins.queryParser());
 server.use(restify.plugins.bodyParser());
 server.use(restify.plugins.gzipResponse());
+server.use(CookieParser.parse);
 server.pre(cors.preflight);
 server.use(cors.actual);
 server.use(DATABASES.dbsParser);
