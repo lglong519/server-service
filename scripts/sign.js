@@ -8,12 +8,15 @@ function scheduleCronstyle () {
 	schedule.scheduleJob('0 0 0 * * *', () => {
 		debug(`reset all ${moment().format('YYYY-MM-DD HH:mm:SS')}`);
 		const db = dbs.service;
-		db.model('TiebaAccount').find({}).exec().then(results => {
-			results.forEach(account => {
-				let tb = new TiebaService({ db, user: account.user });
-				tb.tiebaAccount = account;
-				tb.resetAll();
-			});
+		db.model('Tieba').update(
+			{},
+			{
+				status: 'pendding',
+				desc: '',
+			},
+			{ multi: true }
+		).catch(err => {
+			debug(err);
 		});
 	});
 	for (let i = 1; i < 24; i++) {

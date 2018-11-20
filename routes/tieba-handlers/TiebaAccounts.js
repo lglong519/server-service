@@ -74,28 +74,21 @@ const sumarize = (req, res, next) => {
 			info.void = results.length;
 		}),
 		query().where({
-			status: {
-				$in: ['pendding', undefined]
-			},
-			void: {
-				$ne: true
-			}
+			status: 'pendding',
+			void: false,
 		}).then(results => {
 			info.pendding = results.length;
 		}),
 		query().where({
 			status: 'resolve',
-			void: {
-				$ne: true
-			}
+			void: false,
+
 		}).then(results => {
 			info.resolve = results.length;
 		}),
 		query().where({
 			status: 'reject',
-			void: {
-				$ne: true
-			}
+			void: false,
 		}).then(results => {
 			info.reject = results.length;
 		}),

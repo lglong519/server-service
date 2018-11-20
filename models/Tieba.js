@@ -42,7 +42,6 @@ const mainSchema = new Schema({
 	void: {
 		type: Boolean,
 		default: false,
-		required: true,
 	},
 });
 

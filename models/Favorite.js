@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const mainSchema = new Schema({
+	favorFolder: {
+		type: Schema.Types.Mixed,
+		ref: 'FavorFolder',
+	},
 	title: {
 		type: String,
 		// required: true,
@@ -43,6 +47,10 @@ const mainSchema = new Schema({
 		type: Schema.Types.ObjectId,
 		ref: 'User'
 	},
+	active: {
+		type: Boolean,
+		default: true
+	}
 });
 
 module.exports = db => db.model('Favorite', mainSchema, 'favorites');

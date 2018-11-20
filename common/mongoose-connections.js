@@ -19,13 +19,20 @@ const promises = [];
 const DATABASES = {};
 
 _.each(nconf.get('DATABASES'), (val, key) => {
-	DATABASES[key] = mongoose.createConnection(MONGO_URI + val, { autoIndex: true, useNewUrlParser: true });
+	DATABASES[key] = mongoose.createConnection(MONGO_URI + val, { autoIndex: true,
+		useNewUrlParser: true,
+		autoReconnect: true,
+		reconnectTries: 30,
+		reconnectInterval: 10000 });
 	DATABASES[key].on('connected', () => {
-		debug(`Mongoose connect to ${MONGO_URI}${val}`);
+		debug(`Mongoose connect to ${MONGO_URI}${val}`, new Date().toLocaleString());
 	});
 	DATABASES[key].on('error', () => {
-		debugErr('MongoDB connection error:', val);
+		debugErr('MongoDB connection error:', val, new Date().toLocaleString());
 		process.exit(-1);
+	});
+	DATABASES[key].on('disconnected', () => {
+		debugErr('MongoDB disconnected!', new Date().toLocaleString());
 	});
 	_.each(models, item => item(DATABASES[key]));
 	promises.push(DATABASES[key]);

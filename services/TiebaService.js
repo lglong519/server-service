@@ -36,6 +36,7 @@ class Tieba {
 					{
 						upsert: true,
 						new: true,
+						setDefaultsOnInsert: true
 					}
 				);
 			}
@@ -104,8 +105,11 @@ class Tieba {
 					{
 						upsert: true,
 						new: true,
+						setDefaultsOnInsert: true
 					}
-				);
+				).catch(err => {
+					debug(err);
+				});
 			});
 			return Promise.all(promises);
 		}).then(results => {
@@ -143,9 +147,7 @@ class Tieba {
 			return this.db.model('Tieba').find({
 				user: this.user,
 				tiebaAccount: this.tiebaAccount._id,
-				void: {
-					$ne: true
-				}
+				void: false
 			}).exec();
 		}).then(result => {
 			this.tiebas = result;
@@ -165,9 +167,7 @@ class Tieba {
 				},
 				user: this.user,
 				tiebaAccount: this.tiebaAccount._id,
-				void: {
-					$ne: true
-				}
+				void: false
 			}).exec();
 		}).then(result => {
 			this.tiebas = result;
