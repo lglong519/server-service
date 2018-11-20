@@ -43,6 +43,11 @@ const mainSchema = new Schema({
 		type: Boolean,
 		default: false,
 	},
+	sequence: {
+		type: Number,
+		default: Date.now,
+		index: true
+	},
 });
 
 module.exports = db => db.model('Tieba', mainSchema, 'tiebas');

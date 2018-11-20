@@ -17,28 +17,38 @@ class Tieba {
 	 * @description get userid from baidu,save to dbs
 	 */
 	init ({ account, BDUSS }) {
+		if (!account || !BDUSS) {
+			return Promise.reject('invalid account or BDUSS');
+		}
 		return request({
 			uri: `http://tieba.baidu.com/home/get/panel?ie=utf-8&un=${encodeURIComponent(account)}`,
 			json: true,
 		}).then(result => {
 			if (result.no == 0) {
-				return this.db.model('TiebaAccount').findOneAndUpdate(
-					{
-						user: this.user,
-						account: result.data.name
-					},
-					{
-						user: this.user,
-						account: result.data.name,
-						uid: result.data.id,
-						BDUSS
-					},
-					{
-						upsert: true,
-						new: true,
-						setDefaultsOnInsert: true
+				return this.getTbs(BDUSS).then(result => {
+					let active = false;
+					if (result.is_login == 1) {
+						active = true;
 					}
-				);
+					return this.db.model('TiebaAccount').findOneAndUpdate(
+						{
+							user: this.user,
+							account: result.data.name
+						},
+						{
+							user: this.user,
+							account: result.data.name,
+							uid: result.data.id,
+							BDUSS,
+							active
+						},
+						{
+							upsert: true,
+							new: true,
+							setDefaultsOnInsert: true
+						}
+					);
+				});
 			}
 			throw result;
 		}).then(result => {
@@ -50,6 +60,9 @@ class Tieba {
 	 * @description get tiebas from baidu,save to dbs
 	 */
 	getAll () {
+		if (!this.tiebaAccount.active) {
+			return Promise.reject('invalid BDUSS');
+		}
 		let now = Date.now();
 		let options = {
 			method: 'POST',
@@ -121,6 +134,9 @@ class Tieba {
 	 */
 	getAccount () {
 		if (this.tiebaAccount) {
+			if (!this.tiebaAccount.active) {
+				return Promise.reject('invalid BDUSS');
+			}
 			return Promise.resolve();
 		}
 		if (!this.account) {
@@ -132,6 +148,9 @@ class Tieba {
 		}).exec().then(result => {
 			if (!result) {
 				throw Error('ERROR_NOT_FOUND');
+			}
+			if (!result.active) {
+				return Promise.reject('invalid BDUSS');
 			}
 			this.tiebaAccount = result;
 		});
@@ -176,7 +195,7 @@ class Tieba {
 	/**
 	 * @description get tbs for sign
 	 */
-	getTbs () {
+	getTbs (BDUSS) {
 		let options = {
 			uri: 'http://tieba.baidu.com/dc/common/tbs',
 			headers: {
@@ -186,7 +205,7 @@ class Tieba {
 				'User-Agent': 'fuck phone',
 				'Referer': 'http://tieba.baidu.com/',
 				'X-Forwarded-For': `115.28.1.${Math.random() * 254}` >> 0,
-				Cookie: `BDUSS=${this.tiebaAccount.BDUSS}`
+				Cookie: `BDUSS=${BDUSS || this.tiebaAccount.BDUSS}`
 			},
 			json: true,
 		};
@@ -198,6 +217,9 @@ class Tieba {
 	 * @returns void
 	 */
 	signOne (tieba) {
+		if (this.tiebaAccount && !this.tiebaAccount.active) {
+			return Promise.reject('invalid BDUSS');
+		}
 		if (tieba.status == 'resolve' || tieba.void) {
 			return Promise.resolve(tieba);
 		}

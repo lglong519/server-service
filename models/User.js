@@ -39,6 +39,11 @@ const mainSchema = new Schema({
 	data: {
 		type: Schema.Types.Mixed
 	},
+	sequence: {
+		type: Number,
+		default: Date.now,
+		index: true
+	},
 });
 
 mainSchema.plugin(encrypt, { paths: ['email', 'phone', 'password'] });

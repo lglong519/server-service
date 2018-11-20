@@ -21,7 +21,12 @@ const mainSchema = new Schema({
 	active: {
 		type: Boolean,
 		default: false
-	}
+	},
+	sequence: {
+		type: Number,
+		default: Date.now,
+		index: true
+	},
 });
 
 module.exports = db => db.model('TiebaAccount', mainSchema, 'tiebaaccounts');
