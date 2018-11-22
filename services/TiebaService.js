@@ -16,13 +16,15 @@ class Tieba {
 	/**
 	 * @description get userid from baidu,save to dbs
 	 */
-	init ({ account, BDUSS }) {
-		if (!account || !BDUSS) {
-			return Promise.reject('invalid account or BDUSS');
+	init (BDUSS) {
+		if (!BDUSS) {
+			return Promise.reject('invalid BDUSS');
 		}
-		return request({
-			uri: `http://tieba.baidu.com/home/get/panel?ie=utf-8&un=${encodeURIComponent(account)}`,
-			json: true,
+		return this.getUn(BDUSS).then(un => {
+			return request({
+				uri: `http://tieba.baidu.com/home/get/panel?ie=utf-8&un=${encodeURIComponent(un)}`,
+				json: true,
+			});
 		}).then(result => {
 			if (result.no == 0) {
 				return this.getTbs(BDUSS).then(result => {
@@ -54,6 +56,16 @@ class Tieba {
 		}).then(result => {
 			this.tiebaAccount = result;
 			return result;
+		});
+	}
+	checkBDUSS () {
+		return this.getTbs().then(result => {
+			if (result.is_login != 1) {
+				this.tiebaAccount.active = false;
+				return this.tiebaAccount.save();
+			}
+		}).then(result => {
+
 		});
 	}
 	/**
@@ -90,7 +102,9 @@ class Tieba {
 
 		options.uri += this._serialize(params);
 
-		return request(options).then(result => {
+		return this.checkBDUSS().then(() => {
+			return request(options);
+		}).then(result => {
 			let forum_list = result.forum_list['non-gconforum'];
 			if (result.error_code != '0' || !forum_list) {
 				throw result;
@@ -190,6 +204,21 @@ class Tieba {
 			}).exec();
 		}).then(result => {
 			this.tiebas = result;
+		});
+	}
+	getUn (BDUSS) {
+		let options = {
+			uri: 'http://wapp.baidu.com/',
+			headers: {
+				Cookie: `BDUSS=${BDUSS || this.tiebaAccount.BDUSS}`
+			}
+		};
+		return request(options).then(result => {
+			let match = result.match(/i\?un=([^">]*)?">/);
+			if (match) {
+				return match[1];
+			}
+			throw Error('invalid BDUSS');
 		});
 	}
 	/**

@@ -11,7 +11,6 @@ const handler = restifyMongoose('TiebaAccount', {
 
 const insert = (req, res, next) => {
 	const schema = Joi.object().keys({
-		account: Joi.string().required(),
 		BDUSS: Joi.string().required(),
 	}).unknown().required();
 	const validate = Joi.validate(req.body, schema);
@@ -21,7 +20,7 @@ const insert = (req, res, next) => {
 	}
 	let params = validate.value;
 	let tb = new TiebaService({ db: req.db, user: req.session.user });
-	tb.init(params).then(result => {
+	tb.init(params.BDUSS).then(result => {
 		res.json(result);
 		next();
 	}).catch(err => {
