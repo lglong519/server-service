@@ -1,7 +1,9 @@
 const restifyMongoose = require('restify-mongoose');
-const request = require('request-promise');
 const debug = require('debug')('server:Favorites');
 const cheerio = require('cheerio');
+const Superagent = require('superagent');
+const charset = require('superagent-charset');
+const superagent = charset(Superagent);
 
 const handler = restifyMongoose('Favorite', {
 	pageSize: 10,
@@ -28,8 +30,8 @@ function beforeSave (req, model, cb) {
 	if (!model.link) {
 		return cb(Error('Path `link` is required.'));
 	}
-	request.get(model.link).then(result => {
-		model.title = cheerio.load(result)('title').text();
+	superagent.get(model.link).charset().then(result => {
+		model.title = cheerio.load(result.text)('title').text();
 		cb();
 	}).catch(err => {
 		debug(err);

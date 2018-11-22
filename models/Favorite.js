@@ -18,7 +18,7 @@ const mainSchema = new Schema({
 	},
 	type: {
 		type: String,
-		enum: ['default', 'music', 'article', 'movie', 'fiction', 'novel', 'event'],
+		enum: ['default', 'music', 'article', 'movie', 'fiction', 'novel', 'event', 'doc'],
 		default: 'default'
 	},
 	status: {
