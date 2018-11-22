@@ -7,7 +7,7 @@ const mainSchema = new Schema({
 		ref: 'User',
 		required: true,
 	},
-	account: {
+	un: {
 		type: String,
 		required: true,
 	},
@@ -17,6 +17,8 @@ const mainSchema = new Schema({
 	},
 	BDUSS: {
 		type: String,
+		sparse: true,
+		unique: true
 	},
 	active: {
 		type: Boolean,

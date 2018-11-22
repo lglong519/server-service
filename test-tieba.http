@@ -11,7 +11,6 @@ x-serve: service
 x-access-token: {{accessToken}}
 
 {
-	"account": "y10824",
 	"BDUSS":"BDUSS"
 }
 
@@ -56,14 +55,10 @@ x-serve: service
 
 
 ### sync
-POST {{api}}/tiebas/sync
+POST {{api}}/tieba-accounts/5bef2cd9eed780512e489ce4/tiebas/sync
 Content-Type: application/json
 x-serve: service
 x-access-token: {{accessToken}}
-
-{
-	"account":"y10824"
-}
 
 ### get tiebas
 GET {{api}}/tiebas

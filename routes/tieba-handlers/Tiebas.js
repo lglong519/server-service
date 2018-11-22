@@ -14,10 +14,13 @@ const insert = (req, res, next) => {
 };
 
 const sync = (req, res, next) => {
-	let tb = new TiebaService({ db: req.db, user: req.session.user });
+	let tb = new TiebaService({ db: req.db });
 	req.db.model('TiebaAccount').findById(req.params.id).exec().then(result => {
 		if (!result) {
 			throw Error('ERR_TIEBA_ACCOUNT_NOT_FOUND');
+		}
+		if (!result.active) {
+			throw Error('INVALID_BDUSS');
 		}
 		tb.tiebaAccount = result;
 		tb.getAll();
@@ -26,7 +29,6 @@ const sync = (req, res, next) => {
 	}).catch(err => {
 		next(err);
 	});
-
 };
 
 const sign = (req, res, next) => {

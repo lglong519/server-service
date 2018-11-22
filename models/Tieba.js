@@ -43,6 +43,10 @@ const mainSchema = new Schema({
 		type: Boolean,
 		default: false,
 	},
+	active: {
+		type: Boolean,
+		default: true
+	},
 	sequence: {
 		type: Number,
 		default: Date.now,

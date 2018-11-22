@@ -5,20 +5,18 @@ const debug = require('debug')('server:TiebaService');
 
 class Tieba {
 
-	constructor ({ db, user, account, page_size = 200 } = {}) {
+	constructor ({ db, page_size = 200 } = {}) {
 		this.db = db;
-		this.user = user;
 		this.page_size = page_size;
-		this.account = account;
 		this.pn = 1;
 		this.tiebas = [];
 	}
 	/**
-	 * @description get userid from baidu,save to dbs
+	 * @description 1.获取 un,2.创建帐号,3.save to dbs
 	 */
-	init (BDUSS) {
+	init (BDUSS, user) {
 		if (!BDUSS) {
-			return Promise.reject('invalid BDUSS');
+			return Promise.reject('INVALID_BDUSS');
 		}
 		return this.getUn(BDUSS).then(un => {
 			return request({
@@ -27,19 +25,19 @@ class Tieba {
 			});
 		}).then(result => {
 			if (result.no == 0) {
-				return this.getTbs(BDUSS).then(result => {
+				return this.getTbs(BDUSS).then(tbs => {
 					let active = false;
-					if (result.is_login == 1) {
+					if (tbs.is_login == 1) {
 						active = true;
 					}
-					return this.db.model('TiebaAccount').findOneAndUpdate(
+					let params = [
 						{
-							user: this.user,
-							account: result.data.name
+							user,
+							un: result.data.name
 						},
 						{
-							user: this.user,
-							account: result.data.name,
+							user,
+							un: result.data.name,
 							uid: result.data.id,
 							BDUSS,
 							active
@@ -49,7 +47,11 @@ class Tieba {
 							new: true,
 							setDefaultsOnInsert: true
 						}
-					);
+					];
+					if (active) {
+						this.db.model('Bduss').findOneAndUpdate(...params).catch(err => debug(err));
+					}
+					return this.db.model('TiebaAccount').findOneAndUpdate(...params);
 				});
 			}
 			throw result;
@@ -58,22 +60,47 @@ class Tieba {
 			return result;
 		});
 	}
+	/**
+	 * @description 检测 BDUSS 是否有效,无效将冻结所有 tb
+	 */
 	checkBDUSS () {
 		return this.getTbs().then(result => {
 			if (result.is_login != 1) {
 				this.tiebaAccount.active = false;
 				return this.tiebaAccount.save();
 			}
+			if (this.tiebaAccount.active != true) {
+				this.tiebaAccount.active = true;
+				return this.tiebaAccount.save();
+			}
+		}).then(() => {
+			if (this.tiebaAccount.active != true) {
+				return this.db.model('Tieba').update(
+					{
+						user: this.tiebaAccount.user,
+						tiebaAccount: this.tiebaAccount._id,
+						active: true
+					},
+					{
+						active: false
+					},
+					{
+						multi: true
+					}
+				);
+			}
 		}).then(result => {
-
+			if (result) {
+				throw Error('INVALID_BDUSS');
+			}
 		});
 	}
 	/**
-	 * @description get tiebas from baidu,save to dbs
+	 * @description 1.checkBDUSS,2.get tiebas from baidu,3.save to dbs
 	 */
 	getAll () {
 		if (!this.tiebaAccount.active) {
-			return Promise.reject('invalid BDUSS');
+			return Promise.reject('INVALID_BDUSS');
 		}
 		let now = Date.now();
 		let options = {
@@ -116,18 +143,19 @@ class Tieba {
 			let promises = forum_list.map(item => {
 				return this.db.model('Tieba').findOneAndUpdate(
 					{
-						user: this.user,
+						user: this.tiebaAccount.user,
 						tiebaAccount: this.tiebaAccount._id,
 						fid: item.id,
 					},
 					{
-						user: this.user,
+						user: this.tiebaAccount.user,
 						tiebaAccount: this.tiebaAccount._id,
 						fid: item.id,
 						kw: item.name,
 						level_id: item.level_id,
 						cur_score: item.cur_score,
 						avatar: item.avatar,
+						active: true
 					},
 					{
 						upsert: true,
@@ -149,22 +177,19 @@ class Tieba {
 	getAccount () {
 		if (this.tiebaAccount) {
 			if (!this.tiebaAccount.active) {
-				return Promise.reject('invalid BDUSS');
+				return Promise.reject('INVALID_BDUSS');
 			}
 			return Promise.resolve();
 		}
-		if (!this.account) {
-			return Promise.reject('invalid account');
-		}
 		return this.db.model('TiebaAccount').findOne({
-			user: this.user,
-			account: this.account
+			user: this.tiebaAccount.user,
+			un: this.tiebaAccount.un
 		}).exec().then(result => {
 			if (!result) {
 				throw Error('ERROR_NOT_FOUND');
 			}
 			if (!result.active) {
-				return Promise.reject('invalid BDUSS');
+				throw Error('INVALID_BDUSS');
 			}
 			this.tiebaAccount = result;
 		});
@@ -178,9 +203,10 @@ class Tieba {
 		}
 		return this.getAccount().then(() => {
 			return this.db.model('Tieba').find({
-				user: this.user,
+				user: this.tiebaAccount.user,
 				tiebaAccount: this.tiebaAccount._id,
-				void: false
+				void: false,
+				active: true
 			}).exec();
 		}).then(result => {
 			this.tiebas = result;
@@ -198,10 +224,11 @@ class Tieba {
 				status: {
 					$ne: 'resolve'
 				},
-				user: this.user,
+				user: this.tiebaAccount.user,
 				tiebaAccount: this.tiebaAccount._id,
-				void: false
-			}).exec();
+				void: false,
+				active: true
+			}).limit(1000).exec();
 		}).then(result => {
 			this.tiebas = result;
 		});
@@ -218,7 +245,7 @@ class Tieba {
 			if (match) {
 				return match[1];
 			}
-			throw Error('invalid BDUSS');
+			throw Error('INVALID_BDUSS');
 		});
 	}
 	/**
@@ -247,11 +274,12 @@ class Tieba {
 	 */
 	signOne (tieba) {
 		if (this.tiebaAccount && !this.tiebaAccount.active) {
-			return Promise.reject('invalid BDUSS');
+			return Promise.reject('INVALID_BDUSS');
 		}
-		if (tieba.status == 'resolve' || tieba.void) {
+		if (tieba.status == 'resolve' || tieba.void || !tieba.active) {
 			return Promise.resolve(tieba);
 		}
+
 		let options = {
 			method: 'POST',
 			uri: 'http://c.tieba.baidu.com/c/c/forum/sign?',
@@ -281,6 +309,7 @@ class Tieba {
 		}).catch(err => {
 			tieba.status = 'reject';
 			tieba.desc = err.error_msg || err.message || 'UNKNOWN_ERROR';
+			tieba.sequence = Date.now();
 			debug(err);
 			return tieba.save();
 		});
@@ -292,22 +321,6 @@ class Tieba {
 		return this.queryPending().then(() => {
 			this.tiebas.forEach(item => {
 				this.signOne(item);
-			});
-		}).catch(err => {
-			debug(err);
-		});
-	}
-	/**
-	 * @description reset all tbs status
-	 */
-	resetAll () {
-		return this.query().then(() => {
-			this.tiebas.forEach(item => {
-				item.status = 'pendding';
-				item.desc = '';
-				item.save().catch(err => {
-					debug(`reset fail:${item._id}`, err);
-				});
 			});
 		}).catch(err => {
 			debug(err);

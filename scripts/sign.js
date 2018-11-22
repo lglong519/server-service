@@ -9,7 +9,10 @@ function scheduleCronstyle () {
 		debug(`reset all ${moment().format('YYYY-MM-DD HH:mm:SS')}`);
 		const db = dbs.service;
 		db.model('Tieba').update(
-			{},
+			{
+				active: true,
+				void: false,
+			},
 			{
 				status: 'pendding',
 				desc: '',
@@ -23,12 +26,17 @@ function scheduleCronstyle () {
 		schedule.scheduleJob(`0 0 ${i} * * *`, () => {
 			debug(`sign all ${moment().format('YYYY-MM-DD HH:mm:SS')}`);
 			const db = dbs.service;
-			db.model('TiebaAccount').find({}).exec().then(results => {
-				results.forEach(account => {
-					let tb = new TiebaService({ db, user: account.user });
-					tb.tiebaAccount = account;
-					tb.signAll();
+			db.model('Tieba').find({
+				active: true,
+				void: false,
+			}).populate('tiebaAccount').sort('sequence').limit(2000).exec().then(results => {
+				results.forEach(tieba => {
+					let tb = new TiebaService({ db });
+					tb.tiebaAccount = tieba.tiebaAccount;
+					tb.signOne(tieba).catch(err => debug(err));
 				});
+			}).catch(err => {
+				debug(err);
 			});
 		});
 	}

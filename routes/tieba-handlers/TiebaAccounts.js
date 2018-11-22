@@ -19,8 +19,8 @@ const insert = (req, res, next) => {
 		return next(new Errors.InvalidArgumentError(validate.error));
 	}
 	let params = validate.value;
-	let tb = new TiebaService({ db: req.db, user: req.session.user });
-	tb.init(params.BDUSS).then(result => {
+	let tb = new TiebaService({ db: req.db });
+	tb.init(params.BDUSS, req.session.user).then(result => {
 		res.json(result);
 		next();
 	}).catch(err => {
@@ -37,10 +37,13 @@ const beforeDelete = (req, model) => {
 
 const sign = (req, res, next) => {
 	debug('start to sign all');
-	let tb = new TiebaService({ db: req.db, user: req.session.user });
+	let tb = new TiebaService({ db: req.db });
 	req.db.model('TiebaAccount').findById(req.params.id).exec().then(result => {
 		if (!result) {
 			throw Error('ERR_TIEBA_ACCOUNT_NOT_FOUND');
+		}
+		if (!result.active) {
+			throw Error('INVALID_BDUSS');
 		}
 		tb.tiebaAccount = result;
 		tb.signAll();
@@ -68,28 +71,36 @@ const sumarize = (req, res, next) => {
 			info.total = sum;
 		}),
 		query().where({
-			void: true
+			void: true,
+			active: true,
 		}).then(results => {
 			info.void = results.length;
 		}),
 		query().where({
 			status: 'pendding',
 			void: false,
+			active: true,
 		}).then(results => {
 			info.pendding = results.length;
 		}),
 		query().where({
 			status: 'resolve',
 			void: false,
-
+			active: true,
 		}).then(results => {
 			info.resolve = results.length;
 		}),
 		query().where({
 			status: 'reject',
 			void: false,
+			active: true,
 		}).then(results => {
 			info.reject = results.length;
+		}),
+		query().where({
+			active: false,
+		}).then(results => {
+			info.invalid = results.length;
 		}),
 	]).then(() => {
 		res.json(info);
@@ -98,12 +109,25 @@ const sumarize = (req, res, next) => {
 	});
 };
 
+const beforeSave = (req, model, cb) => {
+	if (!model.BDUSS) {
+		model.active = false;
+		return cb();
+	}
+	let tb = new TiebaService({ db: req.db });
+	tb.tiebaAccount = model;
+	tb.checkBDUSS().finally(() => {
+		cb();
+	});
+
+};
+
 module.exports = {
 	sumarize,
 	sign,
 	insert,
 	query: handler.query(),
 	detail: handler.detail(),
-	update: handler.update(),
+	update: handler.update({ beforeSave }),
 	delete: handler.delete({ beforeDelete }),
 };
