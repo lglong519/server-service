@@ -258,7 +258,7 @@ class Tieba {
 				Host: 'tieba.baidu.com',
 				Pragma: 'no-cache',
 				'Upgrade-Insecure-Requests': 1,
-				'User-Agent': 'fuck phone',
+				'User-Agent': 'mc phone',
 				'Referer': 'http://tieba.baidu.com/',
 				'X-Forwarded-For': `115.28.1.${Math.random() * 254}` >> 0,
 				Cookie: `BDUSS=${BDUSS || this.tiebaAccount.BDUSS}`
@@ -292,6 +292,10 @@ class Tieba {
 		return this.getTbs().then(result => {
 			let params = {
 				'BDUSS': this.tiebaAccount.BDUSS,
+				'_client_id': '03-00-DA-59-05-00-72-96-06-00-01-00-04-00-4C-43-01-00-34-F4-02-00-BC-25-09-00-4E-36',
+				'_client_type': '4',
+				'_client_version': '1.2.1.17',
+				'_phone_imei': '540b43b59d21b7a4824e1fd31b08e9a6',
 				'fid': tieba.fid,
 				'kw': encodeURIComponent(tieba.kw),
 				'tbs': result.tbs,
@@ -299,10 +303,11 @@ class Tieba {
 			options.uri += this._serialize(params);
 			return request(options);
 		}).then(result => {
+			debug(tieba.fid, tieba.kw, this.tiebaAccount._id);
+			debug('sign result', result);
 			if (result.error_code != '0' && result.error_code != '160002') {
 				throw result;
 			}
-
 			tieba.status = 'resolve';
 			tieba.desc = result.error_msg || '';
 			return tieba.save();
