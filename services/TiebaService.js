@@ -300,7 +300,9 @@ class Tieba {
 				'kw': encodeURIComponent(tieba.kw),
 				'tbs': result.tbs,
 			};
-			options.uri += this._serialize(params);
+			let query = `BDUSS=${params.BDUSS}&_client_id=${params._client_id}&_client_type=${params._client_type}&_client_version=${params._client_version}&_phone_imei=${params._phone_imei}&fid=${params.fid}&kw=${params.kw}&tbs=${params.tbs}&`;
+			let sign = md5(`${decodeURIComponent(query.replace(/&/g, ''))}tiebaclient!!!`).toUpperCase();
+			options.uri += `${query}sign=${sign}`;
 			return request(options);
 		}).then(result => {
 			debug(tieba.fid, tieba.kw, this.tiebaAccount._id);
