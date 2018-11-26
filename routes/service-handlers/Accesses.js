@@ -64,7 +64,12 @@ const handle = restifyMongoose('Access', {
 	pageSize: 10,
 	sort: '-updatedAt'
 });
+
 module.exports = {
 	insert,
 	query: handle.query(),
+	get (req, res, next) {
+		res.send(204);
+		next();
+	},
 };

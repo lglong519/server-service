@@ -38,7 +38,7 @@ _.each(nconf.get('DATABASES'), (val, key) => {
 	promises.push(DATABASES[key]);
 });
 Promise.all(promises).then(() => {
-	debug('connections done');
+	debug('\nconnections done\n');
 }).catch(error => {
 	debugErr(error);
 	process.exit();
@@ -51,6 +51,7 @@ module.exports = {
 		req.dbs = DATABASES;
 		req.db = null;
 		let { 'x-serve': serve } = req.headers;
+		req.params.serve && (serve = req.params.serve);
 		if (!serve) {
 			if (req.method === 'GET' && req.query.db) {
 				serve = req.query.db;

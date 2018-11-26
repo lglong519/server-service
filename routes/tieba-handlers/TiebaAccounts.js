@@ -46,7 +46,8 @@ const sign = (req, res, next) => {
 			throw Error('INVALID_BDUSS');
 		}
 		tb.tiebaAccount = result;
-		tb.signAll();
+		return tb.signAll();
+	}).then(() => {
 		res.json(204);
 		next();
 	}).catch(err => {

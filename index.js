@@ -51,7 +51,7 @@ const tiebaRoutes = require('routes/tieba');
 tiebaRoutes(server);
 
 server.listen(nconf.get('PORT'), () => {
-	debug('ready on \x1B[33mhttp://%s:%s\x1B[39m ,NODE_ENV: \x1B[32m%s\x1B[39m', localhost, nconf.get('PORT'), nconf.get('NODE_ENV'));
+	debug('\nready on \x1B[33mhttp://%s:%s\x1B[39m ,NODE_ENV: \x1B[32m%s\x1B[39m\n', localhost, nconf.get('PORT'), nconf.get('NODE_ENV'));
 });
 server.on('error', err => {
 	debug(err);

@@ -7,6 +7,7 @@ const SERVICES_API = '/services/';
 const publicRouter = new RestifyRouter();
 
 publicRouter.post(SERVICES_API + 'accesses', handlers.Accesses.insert);
+publicRouter.get(SERVICES_API + 'accesses/:serve', handlers.Accesses.get);
 publicRouter.post(SERVICES_API + 'access-tokens', handlers.AccessTokens.create);
 publicRouter.get(SERVICES_API + 'access-tokens', handlers.AccessTokens.check);
 publicRouter.get(SERVICES_API + 'packages', handlers.Packages.query);

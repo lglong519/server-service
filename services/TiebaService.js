@@ -2,6 +2,7 @@
 const request = require('request-promise');
 const md5 = require('md5');
 const debug = require('debug')('server:TiebaService');
+const _ = require('lodash');
 
 class Tieba {
 
@@ -97,6 +98,9 @@ class Tieba {
 	}
 	/**
 	 * @description 1.checkBDUSS,2.get tiebas from baidu,3.save to dbs
+	 * @requires tiebaAccount
+	 * @requires tiebaAccount.BDUSS
+	 * @requires tiebaAccount.active true
 	 */
 	getAll () {
 		if (!this.tiebaAccount.active) {
@@ -173,13 +177,24 @@ class Tieba {
 	}
 	/**
 	 * @description query tieba account from dbs
+	 * @requires tiebaAccount
+	 * @requires tiebaAccount.active true
+	 * @or
+	 * @requires user
+	 * @requires un
 	 */
-	getAccount () {
+	getAccount (user, un) {
 		if (this.tiebaAccount) {
 			if (!this.tiebaAccount.active) {
 				return Promise.reject('INVALID_BDUSS');
 			}
 			return Promise.resolve();
+		}
+		if (!user) {
+			return Promise.reject('USER_IS_REQUIRED');
+		}
+		if (!un) {
+			return Promise.reject('UN_IS_REQUIRED');
 		}
 		return this.db.model('TiebaAccount').findOne({
 			user: this.tiebaAccount.user,
@@ -196,43 +211,51 @@ class Tieba {
 	}
 	/**
 	 * @description query tiebas from dbs
+	 * @requires tiebaAccount
 	 */
 	query () {
 		if (this.tiebas && this.tiebas.length) {
 			return Promise.resolve();
 		}
-		return this.getAccount().then(() => {
-			return this.db.model('Tieba').find({
-				user: this.tiebaAccount.user,
-				tiebaAccount: this.tiebaAccount._id,
-				void: false,
-				active: true
-			}).exec();
-		}).then(result => {
+		if (!this.tiebaAccount) {
+			return Promise.reject('INVALID_TB_ACCOUNT');
+		}
+		return this.db.model('Tieba').find({
+			user: this.tiebaAccount.user,
+			tiebaAccount: this.tiebaAccount._id,
+			void: false,
+			active: true
+		}).exec().then(result => {
 			this.tiebas = result;
 		});
 	}
 	/**
 	 * @description query unsigned from dbs
+	 * @requires tiebaAccount
 	 */
 	queryPending () {
 		if (this.tiebas && this.tiebas.length) {
 			return Promise.resolve();
 		}
-		return this.getAccount().then(() => {
-			return this.db.model('Tieba').find({
-				status: {
-					$ne: 'resolve'
-				},
-				user: this.tiebaAccount.user,
-				tiebaAccount: this.tiebaAccount._id,
-				void: false,
-				active: true
-			}).limit(1000).exec();
-		}).then(result => {
+		if (!this.tiebaAccount) {
+			return Promise.reject('INVALID_TB_ACCOUNT');
+		}
+		return this.db.model('Tieba').find({
+			status: {
+				$ne: 'resolve'
+			},
+			user: this.tiebaAccount.user,
+			tiebaAccount: this.tiebaAccount._id,
+			void: false,
+			active: true
+		}).limit(1000).exec().then(result => {
 			this.tiebas = result;
 		});
 	}
+	/**
+	 * @description get account's un
+	 * @requires BDUSS||tiebaAccount.BDUSS
+	 */
 	getUn (BDUSS) {
 		let options = {
 			uri: 'http://wapp.baidu.com/',
@@ -250,8 +273,12 @@ class Tieba {
 	}
 	/**
 	 * @description get tbs for sign
+	 * @requires BDUSS||tiebaAccount.BDUSS
 	 */
 	getTbs (BDUSS) {
+		if (!BDUSS && !_.get(this, 'tiebaAccount.BDUSS')) {
+			return Promise.reject('INVALID_BDUSS');
+		}
 		let options = {
 			uri: 'http://tieba.baidu.com/dc/common/tbs',
 			headers: {
@@ -270,6 +297,7 @@ class Tieba {
 	/**
 	 * @description sign one
 	 * @param {Object} tieba
+	 * @requires tiebaAccount.active
 	 * @returns void
 	 */
 	signOne (tieba) {
@@ -318,7 +346,9 @@ class Tieba {
 			tieba.desc = err.error_msg || err.message || 'UNKNOWN_ERROR';
 			tieba.sequence = Date.now();
 			debug(err);
-			return tieba.save();
+			return Promise.all([err, tieba.save()]);
+		}).then(results => {
+			throw results[0];
 		});
 	}
 	/**
@@ -327,10 +357,8 @@ class Tieba {
 	signAll () {
 		return this.queryPending().then(() => {
 			this.tiebas.forEach(item => {
-				this.signOne(item);
+				this.signOne(item).catch(err => debug(err));
 			});
-		}).catch(err => {
-			debug(err);
 		});
 	}
 	/**

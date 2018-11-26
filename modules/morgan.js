@@ -18,6 +18,7 @@ module.exports = morgan
 module.exports.compile = compile
 module.exports.format = format
 module.exports.token = token
+module.exports.getip = getip
 
 /**
  * Module dependencies.
@@ -25,7 +26,7 @@ module.exports.token = token
  */
 
 var auth = require('basic-auth')
-var debug = require('debug')('server:morgan')
+var debug = require('./Debug')('server:morgan')
 var deprecate = require('depd')('morgan')
 var onFinished = require('on-finished')
 var onHeaders = require('on-headers')
@@ -461,10 +462,11 @@ function getFormatFunction (name) {
  */
 
 function getip (req) {
-	return req.ip ||
-    req._remoteAddress ||
-    (req.connection && req.connection.remoteAddress) ||
-    undefined
+	return req.headers['x-client-ip'] || req.headers['x-real-ip'] || (req.connection && req.connection.remoteAddress) || req.ip || undefined;
+	// return req.ip ||
+	// req._remoteAddress ||
+	// (req.connection && req.connection.remoteAddress) ||
+	// undefined
 }
 
 /**

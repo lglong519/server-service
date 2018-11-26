@@ -1112,7 +1112,7 @@ Logger.stdSerializers.req = function (req) {
         method: req.method,
         url: req.url,
         headers: req.headers,
-        remoteAddress: req.connection.remoteAddress,
+        remoteAddress: req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || req.headers['x-client-ip'] ||  (req.connection && req.connection.remoteAddress) || req.ip || undefined,
         remotePort: req.connection.remotePort
     };
     // Trailers: Skipping for speed. If you need trailers in your app, then
@@ -1554,7 +1554,7 @@ RotatingFileStream.prototype.write = function write(s) {
 			if(this.collection){
 				client.then(db => {
 					let data = JSON.parse(s);
-					data.time = new Date(data.time);
+					data.time =data.createdAt =data.updatedAt =new Date(data.time);
 					db.collection(this.collection).insertOne(data)
 				})
 			}

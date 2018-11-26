@@ -6,11 +6,11 @@ const moment = require('moment');
 
 function scheduleCronstyle () {
 	schedule.scheduleJob('10 0 0 * * *', () => {
-		debug(`reset all ${moment().format('YYYY-MM-DD HH:mm:SS')}`);
+		debug(`\nreset all ${moment().format('YYYY-MM-DD HH:mm:SS')}\n`);
 		require('./reset.js');
 	});
 	schedule.scheduleJob('0 10 * * * *', () => {
-		debug(`sign all ${moment().format('YYYY-MM-DD HH:mm:SS')}`);
+		debug(`\nsign all ${moment().format('YYYY-MM-DD HH:mm:SS')}\n`);
 		const db = dbs.service;
 		db.model('Tieba').find({
 			active: true,
