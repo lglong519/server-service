@@ -1,6 +1,6 @@
 const Errors = require('restify-errors');
 const RedisService = require('services/RedisService');
-const debug = require('debug')('server:initToken');
+const debug = require('Debug')('server:initToken');
 
 module.exports = (req, res, next) => {
 	if (process.env.NODE_ENV == 'localhost') {

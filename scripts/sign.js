@@ -15,6 +15,9 @@ function scheduleCronstyle () {
 		db.model('Tieba').find({
 			active: true,
 			void: false,
+			status: {
+				$ne: 'resolve'
+			}
 		}).populate('tiebaAccount').sort('sequence').limit(400).exec().then(results => {
 			results.forEach(tieba => {
 				let tb = new TiebaService({ db });

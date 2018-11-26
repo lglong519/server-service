@@ -1,12 +1,12 @@
 const restify = require('restify');
 const nconf = require('nconf');
-const debug = require('debug')('server:index');
 const CookieParser = require('restify-cookies');
 require('debug').enable('*,-morgan');
 
 require('app-module-path').addPath(__dirname);
 require('app-module-path').addPath(`${__dirname}/modules`);
 
+const debug = require('Debug')('server:index');
 const localhost = require('common/getHost');
 const morgan = require('morgan');
 
@@ -51,7 +51,7 @@ const tiebaRoutes = require('routes/tieba');
 tiebaRoutes(server);
 
 server.listen(nconf.get('PORT'), () => {
-	debug('ready on \x1B[33m%s\x1B[39m ,NODE_ENV: \x1B[32m%s\x1B[39m ,localhost: \x1B[35m%s\x1B[39m', server.url, nconf.get('NODE_ENV'), localhost);
+	debug('ready on \x1B[33mhttp://%s:%s\x1B[39m ,NODE_ENV: \x1B[32m%s\x1B[39m', localhost, nconf.get('PORT'), nconf.get('NODE_ENV'));
 });
 server.on('error', err => {
 	debug(err);
