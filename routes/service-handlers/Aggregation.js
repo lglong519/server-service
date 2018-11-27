@@ -45,8 +45,8 @@ const query = (req, res, next) => {
 				}
 			},
 			{ $group: { _id: null, sum: { $sum: '$amount' } } },
-		]).exec().then(reusult => {
-			return _.get(reusult, '[0].sum') || 0;
+		]).exec().then(result => {
+			return _.get(result, '[0].sum') || 0;
 		}));
 		generalPs.push(req.db.model('Expense').aggregate([
 			{
@@ -57,14 +57,15 @@ const query = (req, res, next) => {
 				}
 			},
 			{ $group: { _id: null, sum: { $sum: '$amount' } } },
-		]).exec().then(reusult => {
-			return _.get(reusult, '[0].sum') || 0;
+		]).exec().then(result => {
+			return _.get(result, '[0].sum') || 0;
 		}));
 		auditlogsPs.push(req.db.model('Auditlog').countDocuments({
 			time: $date
 		}).exec());
-		accessesPs.push(req.db.model('Access').countDocuments({
-			updatedAt: $date
+		accessesPs.push(req.db.model('Auditlog').countDocuments({
+			updatedAt: $date,
+			'req.url': '/services/accesses/service',
 		}).exec());
 		squatsPs.push(req.db.model('Squat').aggregate([
 			{
@@ -74,8 +75,8 @@ const query = (req, res, next) => {
 				}
 			},
 			{ $group: { _id: null, sum: { $sum: '$count' } } },
-		]).exec().then(reusult => {
-			return _.get(reusult, '[0].sum') || 0;
+		]).exec().then(result => {
+			return _.get(result, '[0].sum') || 0;
 		}));
 		pressUpsPs.push(req.db.model('PressUp').aggregate([
 			{
@@ -85,8 +86,8 @@ const query = (req, res, next) => {
 					}
 			},
 			{ $group: { _id: null, sum: { $sum: '$count' } } },
-		]).exec().then(reusult => {
-			return _.get(reusult, '[0].sum') || 0;
+		]).exec().then(result => {
+			return _.get(result, '[0].sum') || 0;
 		}));
 	});
 
@@ -109,27 +110,28 @@ const query = (req, res, next) => {
 		Promise.all(pressUpsPs).then(results => {
 			pressUps.week = results;
 		}),
-		req.db.model('Access').aggregate([
-			{ $group: { _id: null, accesses: { $sum: '$inc' } } },
-		]).exec().then(reusult => {
-			accesses.total = _.get(reusult, '[0].accesses') || 0;
+		// Access
+		req.db.model('Auditlog').countDocuments({
+			'req.url': '/services/accesses/service'
+		}).exec().then(count => {
+			accesses.total = count;
 		}),
 		req.db.model('Squat').aggregate([
 			{ $group: { _id: null, squats: { $sum: '$count' } } },
-		]).exec().then(reusult => {
-			squats.total = _.get(reusult, '[0].squats') || 0;
+		]).exec().then(result => {
+			squats.total = _.get(result, '[0].squats') || 0;
 		}),
 		req.db.model('PressUp').aggregate([
 			{ $group: { _id: null, pressUps: { $sum: '$count' } } },
-		]).exec().then(reusult => {
-			pressUps.total = _.get(reusult, '[0].pressUps') || 0;
+		]).exec().then(result => {
+			pressUps.total = _.get(result, '[0].pressUps') || 0;
 		}),
 		req.db.model('Expense').aggregate([
 			{ $group: { _id: null, expenses: { $sum: '$amount' } } },
-		]).exec().then(reusult => {
-			expenses.total = _.get(reusult, '[0].expenses') || 0;
+		]).exec().then(result => {
+			expenses.total = _.get(result, '[0].expenses') || 0;
 		}),
-		req.db.model('Auditlog').countDocuments({}).exec().then(count => {
+		req.db.model('Auditlog').find().estimatedDocumentCount().exec().then(count => {
 			auditlogs.total = count;
 		}),
 	]).then(() => {
