@@ -9,6 +9,9 @@ MongoClient.connect(url, { useNewUrlParser: true }, (err, client) => {
 	db.collection('tiebas').updateMany({
 		active: true,
 		void: false,
+		status: {
+			$ne: 'pendding'
+		}
 	}, {
 		$set: {
 			status: 'pendding',
