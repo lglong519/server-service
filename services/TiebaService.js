@@ -335,7 +335,7 @@ class Tieba {
 		}).then(result => {
 			debug(tieba.fid, tieba.kw, this.tiebaAccount._id);
 			debug('sign result', result);
-			if (result.error_code != '0' && result.error_code != '160002') {
+			if (result.error_code != '0' && result.error_code != '160002' || !result.error) {
 				throw result;
 			}
 			tieba.status = 'resolve';
@@ -343,7 +343,7 @@ class Tieba {
 			return tieba.save();
 		}).catch(err => {
 			tieba.status = 'reject';
-			tieba.desc = err.error_msg || err.message || 'UNKNOWN_ERROR';
+			tieba.desc = err.error_msg || err.message || _.get(err, 'error.errmsg') || _.get(err, 'error.usermsg') || 'UNKNOWN_ERROR';
 			tieba.sequence = Date.now();
 			debug(err);
 			return Promise.all([err, tieba.save()]);

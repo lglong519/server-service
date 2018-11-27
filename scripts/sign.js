@@ -1,5 +1,5 @@
 const schedule = require('node-schedule');
-const dbs = require('./index');
+const dbs = require('./connections');
 const debug = require('debug')('server:sign');
 const TiebaService = require('../services/TiebaService');
 const moment = require('moment');
