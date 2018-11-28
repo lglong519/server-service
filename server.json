@@ -6,8 +6,8 @@
 			"max_restarts": 15
 		},
 		{
-			"name": "sign",
-			"script": "./scripts/sign.js",
+			"name": "scripts",
+			"script": "./scripts/index.js",
 			"max_restarts": 15
 		}
 	]

@@ -127,7 +127,7 @@ function morgan (format, options) {
 				return
 			}
 
-			debug('log request')
+			// debug('log request')
 			stream.write(line + '\n')
 		}
 

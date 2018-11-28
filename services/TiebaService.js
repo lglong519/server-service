@@ -335,7 +335,7 @@ class Tieba {
 		}).then(result => {
 			debug(tieba.fid, tieba.kw, this.tiebaAccount._id);
 			debug('sign result', result);
-			if (result.error_code != '0' && result.error_code != '160002' || !result.error) {
+			if (result.error_code != '0' && result.error_code != '160002' && result.error_msg !== '亲，你之前已经签过了' && !result.error) {
 				throw result;
 			}
 			tieba.status = 'resolve';
