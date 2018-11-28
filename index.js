@@ -64,7 +64,7 @@ server.on('error', err => {
 server.on(
 	'after',
 	restify.plugins.auditLogger({
-		log: require('bunyanLogger').createLogger({
+		log: require('./modules/bunyanLogger').createLogger({
 			name: 'auditlogs',
 			streams: [
 				{

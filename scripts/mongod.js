@@ -1,16 +1,19 @@
-const _ = require('lodash');
-require('../modules/Debug').enable('scripts:*');
-const debug = require('../modules/Debug')('scripts:mongod');
+const debug = require('../modules/Debug')('task:mongod');
 const child_process = require('child_process');
+const moment = require('moment');
 
-child_process.exec('service mongod status', (err, stdout, stderr) => {
-	let msg = stdout && stdout.match(/active:(.*)?/i);
-	debug(`\n${msg}`);
-	if (msg && msg[1].trim() == 'inactive (dead)') {
-		child_process.execSync('service mongod start');
-		child_process.execSync('pm2 start all');
-	}
-});
+module.exports = () => {
+	debug(`check mongod status ${moment().format('YYYY-MM-DD HH:mm:SS')}\n`);
+	child_process.exec('service mongod status', (err, stdout, stderr) => {
+		let msg = stdout && stdout.match(/active:(.*)?/i);
+		debug(`\n${msg}`);
+		if (msg && (/inactive\s*\(dead\)|failed\s*\(Result:/i).test(msg[1].trim())) {
+			child_process.execSync('service mongod start');
+			child_process.execSync('pm2 start all');
+		}
+	});
+};
+
 /* stdout
 mongod.service - High-performance, schema-free document-oriented database
    Loaded: loaded (/lib/systemd/system/mongod.service; disabled; vendor preset: enabled)
@@ -43,3 +46,11 @@ stdout ● mongod.service - High-performance, schema-free document-oriented data
    Active: inactive (dead)
      Docs: https://docs.mongodb.org/manual
 */
+/*
+mongod.service - MongoDB Database Server
+   Loaded: loaded (/lib/systemd/system/mongod.service; disabled; vendor preset: enabled)
+   Active: failed (Result: signal) since Wed 2018-11-28 19:35:13 CST; 3min 12s ago
+     Docs: https://docs.mongodb.org/manual
+  Process: 2609 ExecStart=/usr/bin/mongod --config /etc/mongod.conf (code=killed, signal=KILL)
+ Main PID: 2609 (code=killed, signal=KILL)
+ */

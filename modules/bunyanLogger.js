@@ -1106,8 +1106,9 @@ Logger.stdSerializers = {};
 
 // Serialize an HTTP request.
 Logger.stdSerializers.req = function (req) {
-    if (!req || !req.connection)
+	if (!req || !req.connection) {
         return req;
+	}
     return {
         method: req.method,
         url: req.url,

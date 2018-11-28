@@ -1,7 +1,7 @@
 const nconf = require('nconf');
 nconf.required(['MONGO_URI']);
 
-const debug = require('Debug')('connections');
+const debug = require('Debug')('server:connections');
 const debugErr = require('debug')('connections:Error');
 const _ = require('lodash');
 const mongoose = require('mongoose');
