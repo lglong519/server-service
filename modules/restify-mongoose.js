@@ -228,10 +228,10 @@ const Resource = function (Model, options) {
 	this.options.baseUrl = this.options.baseUrl || '';
 	this.options.outputFormat = this.options.outputFormat || 'regular';
 	this.options.modelName = this.options.modelName;
-	this.options.listProjection = this.options.listProjection || function (req, item, cb) {
+	this.options.listProjection = this.options.listProjection || this.options.projection || function (req, item, cb) {
 		cb(null, item);
 	};
-	this.options.detailProjection = this.options.detailProjection || function (req, item, cb) {
+	this.options.detailProjection = this.options.detailProjection || this.options.projection || function (req, item, cb) {
 		cb(null, item);
 	};
 };

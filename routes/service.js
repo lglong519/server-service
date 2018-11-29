@@ -72,6 +72,10 @@ router.get(SERVICES_API + 'favorites', handlers.Favorites.query);
 router.get(SERVICES_API + 'favorites/:id', handlers.Favorites.detail);
 router.patch(SERVICES_API + 'favorites/:id', handlers.Favorites.update);
 router.del(SERVICES_API + 'favorites/:id', handlers.Favorites.delete);
+
+router.get(SERVICES_API + 'auditlogs', handlers.Auditlogs.query);
+router.get(SERVICES_API + 'auditlogs/:id', handlers.Auditlogs.detail);
+
 module.exports = server => {
 	server.use(middleWares.InitProps);
 	publicRouter.applyRoutes(server);
