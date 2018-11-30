@@ -44,6 +44,10 @@ const mainSchema = new Schema({
 		default: Date.now,
 		index: true
 	},
+	role: {
+		type: String,
+		enum: ['admin']
+	},
 });
 
 mainSchema.plugin(encrypt, { paths: ['email', 'phone', 'password'] });

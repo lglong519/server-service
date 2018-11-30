@@ -21,7 +21,7 @@ function projection (req, item, cb) {
 		'ip': _.get(json, 'req.headers["x-real-ip"]') || json.remoteAddress,
 		'action': 'GET',
 		'resource': referer.replace(/http(s)?:\/\/([^/]*)?/i, ''),
-		'host': referer.match(/(http)?(s)?(:\/\/)?([^/]*)?/i) ? referer.match(/http(s)?:\/\/([^/]*)?/i)[0] : '',
+		'host': _.get(referer.match(/http(s)?:\/\/([^/]*)?/i), '[0]') || '',
 		statusCode: _.get(json, 'res.statusCode'),
 		updatedAt: json.updatedAt,
 	};
