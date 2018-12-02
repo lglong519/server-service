@@ -249,7 +249,7 @@ morgan.token('date', function getDateToken (req, res, format) {
 
 	switch (format || 'web') {
 		case 'clf':
-			return clfdate(date)
+			return date.toLocaleString()
 		case 'iso':
 			return date.toISOString()
 		case 'web':

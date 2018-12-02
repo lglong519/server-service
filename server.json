@@ -1,7 +1,7 @@
 {
 	"apps": [
 		{
-			"name": "service",
+			"name": "svc",
 			"script": "./index.js",
 			"max_restarts": 15
 		},
