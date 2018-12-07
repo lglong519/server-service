@@ -173,6 +173,21 @@ class Tieba {
 			return Promise.all(promises);
 		}).then(results => {
 			this.tiebas = this.tiebas.concat(results);
+			return this.db.model('Tieba').update(
+				{
+					user: this.tiebaAccount.user,
+					tiebaAccount: this.tiebaAccount._id,
+					updatedAt: {
+						$lt: now
+					}
+				}, {
+					active: false
+				},
+				{
+					multi: true,
+					setDefaultsOnInsert: true
+				}
+			);
 		});
 	}
 	/**
