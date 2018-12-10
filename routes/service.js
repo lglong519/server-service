@@ -1,6 +1,7 @@
 /* eslint prefer-template:0 */
 const RestifyRouter = require('restify-router').Router;
 const handlers = require('require-dir')('service-handlers');
+const commonHandlers = require('require-dir')('common-handlers');
 const middleWares = require('require-dir')('middleWares');
 const SERVICES_API = '/services/';
 
@@ -20,7 +21,7 @@ router.use(middleWares.initToken);
 
 router.del(SERVICES_API + 'access-tokens', handlers.AccessTokens.remove);
 router.get(SERVICES_API + 'accesses', handlers.Accesses.query);
-router.get(SERVICES_API + 'me', handlers.Me.profile);
+router.get(SERVICES_API + 'me', commonHandlers.Me.profile);
 
 router.post(SERVICES_API + 'users', handlers.Users.insert);
 router.get(SERVICES_API + 'users', handlers.Users.query);

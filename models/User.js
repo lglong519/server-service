@@ -27,6 +27,7 @@ const mainSchema = new Schema({
 	},
 	client: {
 		type: String,
+		enum: ['ACC', 'CNS'],
 		required: true,
 	},
 	inc: {
@@ -46,7 +47,8 @@ const mainSchema = new Schema({
 	},
 	role: {
 		type: String,
-		enum: ['admin']
+		enum: ['admin', 'user'],
+		default: 'user'
 	},
 });
 

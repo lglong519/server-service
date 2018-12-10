@@ -20,7 +20,7 @@ module.exports = (req, res, next) => {
 			debug(req.session);
 			return req.db.model('User').findById(req.session.user);
 		}).then(result => {
-			if (_.get(result, 'role') != 'admin') {
+			if (!_.get(result, 'role')) {
 				throw new Errors.ForbiddenError('NO_PERMISSION');
 			}
 			next();

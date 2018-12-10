@@ -9,7 +9,7 @@ public.post(COMMON_API + 'access-tokens', handlers.AccessTokens.create);
 public.get(COMMON_API + 'access-tokens', handlers.AccessTokens.check);
 
 const router = new RestifyRouter();
-router.use(middleWares.initToken);
+router.use(middleWares.accToken);
 
 module.exports = server => {
 	public.applyRoutes(server);

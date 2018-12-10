@@ -16,7 +16,7 @@ const create = (req, res, next) => {
 			Joi.string().regex(regExp.CHNPhone)
 		).required(),
 		password: Joi.string().regex(regExp.password).required(),
-		client: Joi.string().required(),
+		client: Joi.string().default('ACC').valid(['ACC']).required(),
 	}).required();
 	const validate = Joi.validate(req.body, schema);
 	if (validate.error) {
@@ -53,7 +53,9 @@ const create = (req, res, next) => {
 		if (result.password !== params.password) {
 			throw new Errors.InvalidContentError('INVALID_PASSWORD');
 		}
-
+		if (!result.role) {
+			throw new Errors.ForbiddenError('NO_PERMISSION');
+		}
 		return RedisService.create({
 			user: result._id,
 			client: params.client,
