@@ -5,8 +5,8 @@ const _ = require('lodash');
 
 module.exports = (req, res, next) => {
 	if (process.env.NODE_ENV == 'localhost') {
-		req.session = { user: '5b8e55871cb0e6125a9c0314' };
-		return next();
+		// req.session = { user: '5b8e55871cb0e6125a9c0314' };
+		// return next();
 	}
 	const { 'x-access-token': accessToken } = req.headers;
 	if (!accessToken) {

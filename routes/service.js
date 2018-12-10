@@ -53,7 +53,7 @@ router.del(SERVICES_API + 'waists/:id', handlers.Waists.delete);
 
 router.get(SERVICES_API + 'aggregation', handlers.Aggregation.query);
 router.get(SERVICES_API + 'aggregation/git/:owner', handlers.Aggregation.git);
-router.get(SERVICES_API + 'weather/:city', handlers.Weather.detail);
+router.get(SERVICES_API + 'weather/:city', commonHandlers.Weather.detail);
 
 router.post(SERVICES_API + 'expenses', handlers.Expenses.insert);
 router.get(SERVICES_API + 'expenses', handlers.Expenses.query);
