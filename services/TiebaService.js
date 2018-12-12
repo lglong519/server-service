@@ -363,7 +363,7 @@ class Tieba {
 			debug(err);
 			return Promise.all([err, tieba.save()]);
 		}).then(results => {
-			throw results[0];
+			return Promise.reject(results[0]);
 		});
 	}
 	/**

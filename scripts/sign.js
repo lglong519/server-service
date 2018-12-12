@@ -16,7 +16,7 @@ module.exports = () => {
 		results.forEach(tieba => {
 			let tb = new TiebaService({ db });
 			tb.tiebaAccount = tieba.tiebaAccount;
-			tb.signOne(tieba).catch(err => debug(err));
+			tb.signOne(tieba).catch(err => debug(tieba._id, err));
 		});
 	}).catch(err => {
 		debug(err);

@@ -3,8 +3,16 @@ const schedule = require('node-schedule');
 const debug = require('../modules/Debug')('task:index');
 const mongod = require('./mongod.js');
 const reset = require('./reset.js');
-const sign = require('./sign.js');
-
+const updateLogs = require('./updateLogs.js');
+let sign;
+try {
+	sign = require('./sign.js');
+} catch (e) {
+	sign = function () {
+		debug('sign.js', e);
+	};
+	sign();
+}
 debug('tasks started');
 function scheduleCronstyle () {
 	const rule = new schedule.RecurrenceRule();
@@ -15,6 +23,7 @@ function scheduleCronstyle () {
 
 	schedule.scheduleJob('10 0 0 * * *', () => {
 		reset();
+		updateLogs();
 	});
 
 	schedule.scheduleJob('0 10 * * * *', () => {

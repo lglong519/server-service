@@ -1,5 +1,5 @@
 const MongoClient = require('mongodb').MongoClient;
-const debug = require('../modules/Debug')('task:sign');
+const debug = require('../modules/Debug')('task:reset');
 const moment = require('moment');
 
 module.exports = () => {
@@ -30,3 +30,7 @@ module.exports = () => {
 		});
 	});
 };
+
+if (process.env.res === '1') {
+	module.exports();
+}
