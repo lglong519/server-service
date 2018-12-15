@@ -11,41 +11,39 @@ mongoose.plugin(timestamps);
 const require_dir = require('require-dir');
 const models = require_dir('../models');
 const Promise = require('bluebird');
+const Q = require('q');
 
 mongoose.Promise = Promise;
 mongoose.set('debug', true);
 
-const promises = [];
 const DATABASES = {};
+const promises = [DATABASES];
 
 _.each(nconf.get('DATABASES'), (val, key) => {
-	DATABASES[key] = mongoose.createConnection(MONGO_URI + val, { autoIndex: true,
+	const deferred = Q.defer();
+	DATABASES[key] = mongoose.createConnection(MONGO_URI + val, {
+		autoIndex: true,
 		useNewUrlParser: true,
 		autoReconnect: true,
 		reconnectTries: 30,
-		reconnectInterval: 10000 });
+		reconnectInterval: 10000
+	});
 	DATABASES[key].on('connected', () => {
 		debug(`Mongoose connect to ${MONGO_URI}${val}`, new Date().toLocaleString());
+		deferred.resolve();
 	});
 	DATABASES[key].on('error', () => {
-		debugErr('MongoDB connection error:', val, new Date().toLocaleString());
-		process.exit(-1);
+		deferred.reject(`MongoDB connection error: ${val}`);
 	});
 	DATABASES[key].on('disconnected', () => {
-		debugErr('MongoDB disconnected!', new Date().toLocaleString());
+		deferred.reject(`MongoDB disconnected: ${val}`);
 	});
 	_.each(models, item => item(DATABASES[key]));
-	promises.push(DATABASES[key]);
-});
-Promise.all(promises).then(() => {
-	debug('\nconnections done\n');
-}).catch(error => {
-	debugErr(error);
-	process.exit();
+	promises.push(deferred.promise);
 });
 
 module.exports = {
-	dbs: DATABASES,
+	connections: Promise.all(promises),
 	dbsParser (req, res, next) {
 		req.session = {};
 		req.dbs = DATABASES;

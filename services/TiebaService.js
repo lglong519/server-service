@@ -178,7 +178,7 @@ class Tieba {
 					user: this.tiebaAccount.user,
 					tiebaAccount: this.tiebaAccount._id,
 					updatedAt: {
-						$lt: now
+						$lt: now - 30000
 					}
 				}, {
 					active: false

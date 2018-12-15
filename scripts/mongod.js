@@ -7,13 +7,24 @@ module.exports = () => {
 	child_process.exec('service mongod status', (err, stdout, stderr) => {
 		let msg = stdout && stdout.match(/active:(.*)?/i);
 		debug(`\n${msg}`);
+		if (msg && (/Active:\s*failed/i).test(msg[1].trim())) {
+			debug(0);
+			child_process.execSync('rm /data/db/mongod.lock');
+			child_process.execSync('mongod --dbpath /var/lib/mongodb --logpath /var/log/mongod.log');
+			child_process.execSync('service mongod start');
+			child_process.execSync('pm2 start all');
+		}
 		if (msg && (/inactive\s*\(dead\)|failed\s*\(Result:/i).test(msg[1].trim())) {
+			debug(1);
 			child_process.execSync('service mongod start');
 			child_process.execSync('pm2 start all');
 		}
 	});
 };
 
+if (process.env.res === '1') {
+	module.exports();
+}
 /* stdout
 mongod.service - High-performance, schema-free document-oriented database
    Loaded: loaded (/lib/systemd/system/mongod.service; disabled; vendor preset: enabled)

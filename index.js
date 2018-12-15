@@ -25,7 +25,7 @@ const server = restify.createServer({
 });
 server.server.setTimeout(120000);
 
-const DATABASES = require('common/mongoose-connections');
+const { connections, dbsParser } = require('common/mongoose-connections');
 const corsMiddleware = require('restify-cors-middleware');
 const cors = corsMiddleware(nconf.get('CORS'));
 
@@ -37,7 +37,7 @@ server.use(restify.plugins.gzipResponse());
 server.use(CookieParser.parse);
 server.pre(cors.preflight);
 server.use(cors.actual);
-server.use(DATABASES.dbsParser);
+server.use(dbsParser);
 
 const greetingRoutes = require('routes/greeting');
 greetingRoutes(server);
@@ -56,11 +56,16 @@ server.listen(nconf.get('PORT'), () => {
 	debug('\nready on \x1B[33mhttp://%s:%s\x1B[39m ,NODE_ENV: \x1B[32m%s\x1B[39m\n', localhost, nconf.get('PORT'), nconf.get('NODE_ENV'));
 });
 server.on('error', err => {
-	debug(err);
+	debug('server', err);
 	if ((/EADDRINUSE/i).test(err.code)) {
 		debug(`端口:${err.port} 被占用`);
 	}
-	process.exit();
+	throw err;
+});
+
+connections.catch(err => {
+	debug('connections error', err);
+	throw err;
 });
 
 server.on(

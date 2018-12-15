@@ -54,6 +54,7 @@
 		"nodemailer-smtp-transport": "^2.7.4",
 		"on-finished": "^2.3.0",
 		"on-headers": "^1.0.1",
+		"q": "^1.5.1",
 		"rand-token": "^0.4.0",
 		"request": "^2.88.0",
 		"request-promise": "^4.2.2",

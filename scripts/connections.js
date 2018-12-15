@@ -8,4 +8,4 @@ nconf.file(`${process.cwd()}/.config`).env();
 
 process.env.NODE_ENV = nconf.get('NODE_ENV');
 
-module.exports = require('common/mongoose-connections').dbs;
+module.exports = require('common/mongoose-connections').connections;

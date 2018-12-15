@@ -37,7 +37,6 @@ nconf.required([
 let client=new Promise((res,rej)=>{
 	MongoClient.connect(nconf.get('MONGO_URI'), {useNewUrlParser:true}, function(err, client) {
 		if (err) {
-			debug(err);
 			return rej(err);
 		}
 		res(client.db(nconf.get('DATABASES:service')));
@@ -1557,6 +1556,8 @@ RotatingFileStream.prototype.write = function write(s) {
 					let data = JSON.parse(s);
 					data.time =data.createdAt =data.updatedAt =new Date(data.time);
 					db.collection(this.collection).insertOne(data)
+				}).catch(err => {
+					debug(err);
 				})
 			}
 		}catch(e){

@@ -3,12 +3,14 @@
 		{
 			"name": "svc",
 			"script": "./index.js",
-			"max_restarts": 15
+			"min_uptime": "60s",
+			"max_restarts": 10
 		},
 		{
 			"name": "task",
 			"script": "./scripts/index.js",
-			"max_restarts": 15
+			"min_uptime":"60s",
+			"max_restarts": 10
 		}
 	]
 }
