@@ -181,7 +181,8 @@ class Tieba {
 						$lt: now - 30000
 					}
 				}, {
-					active: false
+					active: false,
+					desc: '无效'
 				},
 				{
 					multi: true,

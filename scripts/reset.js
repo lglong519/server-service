@@ -18,7 +18,7 @@ module.exports = () => {
 		}, {
 			$set: {
 				status: 'pendding',
-				desc: '',
+				desc: new Date().toLocaleDateString(),
 				updatedAt: new Date()
 			}
 		}).then(() => {

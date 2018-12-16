@@ -1,6 +1,7 @@
 const debug = require('../modules/Debug')('task:mongod');
 const child_process = require('child_process');
 const moment = require('moment');
+const fs = require('fs');
 
 module.exports = () => {
 	debug(`check mongod status ${moment().format('YYYY-MM-DD HH:mm:SS')}\n`);
@@ -10,8 +11,10 @@ module.exports = () => {
 		// mongod 已停止
 		if (msg && (/failed\s*\(Result:\s*exit-code\)/i).test(msg[1].trim())) {
 			debug(0);
-			child_process.execSync('rm /data/db/mongod.lock');
-			child_process.execSync('mongod --dbpath /var/lib/mongodb --logpath /var/log/mongod.log');
+			if (fs.existsSync('/data/db/mongod.lock')) {
+				fs.unlinkSync('/data/db/mongod.lock');
+			}
+			child_process.execSync('mongod --fork --dbpath /var/lib/mongodb --logpath /var/log/mongod.log');
 			child_process.execSync('service mongod start');
 			child_process.execSync('pm2 start all');
 		}
