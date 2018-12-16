@@ -2,15 +2,19 @@
 	"apps": [
 		{
 			"name": "svc",
+			"cwd": "/root/data/server-service",
 			"script": "./index.js",
 			"min_uptime": "60s",
-			"max_restarts": 10
+			"max_restarts": 10,
+			"watch":false
 		},
 		{
 			"name": "task",
+			"cwd": "/root/data/server-service",
 			"script": "./scripts/index.js",
 			"min_uptime":"60s",
-			"max_restarts": 10
+			"max_restarts": 10,
+			"watch":false
 		}
 	]
 }

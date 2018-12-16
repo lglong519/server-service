@@ -7,13 +7,15 @@ module.exports = () => {
 	child_process.exec('service mongod status', (err, stdout, stderr) => {
 		let msg = stdout && stdout.match(/active:(.*)?/i);
 		debug(`\n${msg}`);
-		if (msg && (/Active:\s*failed/i).test(msg[1].trim())) {
+		// mongod 已停止
+		if (msg && (/failed\s*\(Result:\s*exit-code\)/i).test(msg[1].trim())) {
 			debug(0);
 			child_process.execSync('rm /data/db/mongod.lock');
 			child_process.execSync('mongod --dbpath /var/lib/mongodb --logpath /var/log/mongod.log');
 			child_process.execSync('service mongod start');
 			child_process.execSync('pm2 start all');
 		}
+		// service 未启动
 		if (msg && (/inactive\s*\(dead\)|failed\s*\(Result:/i).test(msg[1].trim())) {
 			debug(1);
 			child_process.execSync('service mongod start');
@@ -65,3 +67,4 @@ mongod.service - MongoDB Database Server
   Process: 2609 ExecStart=/usr/bin/mongod --config /etc/mongod.conf (code=killed, signal=KILL)
  Main PID: 2609 (code=killed, signal=KILL)
  */
+// 测试 DEBUG='*' res=1  node scripts/mongod.js

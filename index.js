@@ -7,7 +7,7 @@ require('app-module-path').addPath(__dirname);
 require('app-module-path').addPath(`${__dirname}/modules`);
 
 const debug = require('Debug')('server:index');
-const localhost = require('common/getHost');
+const listenWithoutOccupied = require('common/listenWithoutOccupied');
 const morgan = require('morgan');
 
 nconf.file('.config').env();
@@ -52,9 +52,7 @@ tiebaRoutes(server);
 const disRoutes = require('routes/dis');
 disRoutes(server);
 
-server.listen(nconf.get('PORT'), () => {
-	debug('\nready on \x1B[33mhttp://%s:%s\x1B[39m ,NODE_ENV: \x1B[32m%s\x1B[39m\n', localhost, nconf.get('PORT'), nconf.get('NODE_ENV'));
-});
+listenWithoutOccupied(server, nconf.get('PORT'));
 server.on('error', err => {
 	debug('server', err);
 	if ((/EADDRINUSE/i).test(err.code)) {

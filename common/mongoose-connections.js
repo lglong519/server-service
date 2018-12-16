@@ -33,10 +33,10 @@ _.each(nconf.get('DATABASES'), (val, key) => {
 		deferred.resolve();
 	});
 	DATABASES[key].on('error', () => {
-		deferred.reject(`MongoDB connection error: ${val}`);
+		deferred.reject(Error(`MongoDB connection error: ${val}`));
 	});
 	DATABASES[key].on('disconnected', () => {
-		deferred.reject(`MongoDB disconnected: ${val}`);
+		deferred.reject(Error(`MongoDB disconnected: ${val}`));
 	});
 	_.each(models, item => item(DATABASES[key]));
 	promises.push(deferred.promise);
@@ -56,7 +56,7 @@ module.exports = {
 			} else {
 				serve = 'pass';
 				req.session.pass = true;
-				console.error(`\x1B[31mInvalid x-serve:${serve}\x1B[39m`);
+				debugErr(`\x1B[31mInvalid x-serve:${serve}\x1B[39m`);
 			}
 		}
 		req.db = req.dbs[serve];
