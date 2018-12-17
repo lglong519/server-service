@@ -26,10 +26,17 @@
 	},
 	"homepage": "https://github.com/lglong519/server-service#readme",
 	"eslintConfig": {
-		"extends": "teslint"
+		"extends": "teslint/typescript",
+		"globals": {
+			"ActiveXObject": false,
+			"expect": false,
+			"jQuery": false,
+			"window": false,
+			"global": false
+		}
 	},
 	"devDependencies": {
-		"eslint-config-teslint": "^3.0.7",
+		"eslint-config-teslint": "latest",
 		"gulp": "^4.0.0",
 		"gulp-replace": "^1.0.0",
 		"gulp-ssh": "^0.7.0"
