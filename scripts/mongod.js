@@ -14,9 +14,14 @@ module.exports = () => {
 			if (fs.existsSync('/data/db/mongod.lock')) {
 				fs.unlinkSync('/data/db/mongod.lock');
 			}
-			child_process.execSync('mongod --fork --dbpath /var/lib/mongodb --logpath /var/log/mongod.log');
-			child_process.execSync('service mongod start');
-			child_process.execSync('pm2 start all');
+			child_process.exec('mongod --fork --dbpath /var/lib/mongodb --logpath /var/log/mongod.log', (err, stdout, stderr) => {
+				if (err) {
+					return debug('mongod err', err);
+				}
+				child_process.execSync('service mongod start');
+				child_process.execSync('pm2 start all');
+			});
+			return;
 		}
 		// service 未启动
 		if (msg && (/inactive\s*\(dead\)|failed\s*\(Result:/i).test(msg[1].trim())) {
@@ -70,4 +75,15 @@ mongod.service - MongoDB Database Server
   Process: 2609 ExecStart=/usr/bin/mongod --config /etc/mongod.conf (code=killed, signal=KILL)
  Main PID: 2609 (code=killed, signal=KILL)
  */
+/*
+Error: Command failed: mongod --fork --dbpath /var/lib/mongodb --logpath /var/log/mongod.log
+    at checkExecSyncError (child_process.js:602:13)
+    at Object.execSync (child_process.js:642:13)
+    at child_process.exec (/root/data/server-service/scripts/mongod.js:17:18)
+    at ChildProcess.exithandler (child_process.js:283:5)
+    at emitTwo (events.js:126:13)
+    at ChildProcess.emit (events.js:214:7)
+    at maybeClose (internal/child_process.js:915:16)
+    at Process.ChildProcess._handle.onexit (internal/child_process.js:209:5)
+*/
 // 测试 DEBUG='*' res=1  node scripts/mongod.js
