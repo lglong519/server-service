@@ -3,7 +3,7 @@
 		{
 			"name": "svc",
 			"cwd": "/root/data/server-service",
-			"script": "./index.js",
+			"script": "./dist/index.js",
 			"min_uptime": "60s",
 			"max_restarts": 10,
 			"watch":false
@@ -11,7 +11,7 @@
 		{
 			"name": "task",
 			"cwd": "/root/data/server-service",
-			"script": "./scripts/index.js",
+			"script": "./dist/scripts/index.js",
 			"min_uptime":"60s",
 			"max_restarts": 10,
 			"watch":false

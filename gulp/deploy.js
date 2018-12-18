@@ -3,6 +3,7 @@ const gulp = require('gulp');
 const GulpSSH = require('gulp-ssh');
 const nconf = require('nconf');
 const replace = require('gulp-replace');
+const clean = require('gulp-clean');
 
 nconf.file('.config');
 nconf.required([
@@ -36,10 +37,11 @@ const gulpSSH = new GulpSSH({
 	sshConfig: config
 });
 const destGlobs = [
-	'./**/*.*',
-	'./**/*',
+	'./**/*.js',
+	'./**/*.json',
+	// './**/*',
 	'!**/node_modules/**',
-	'!**/logs/**',
+	// '!**/logs/**',
 ];
 gulp.task('dest', () => gulp
 	.src(destGlobs)
@@ -114,7 +116,7 @@ gulp.task(
 
 gulp.task(
 	'deploy',
-	gulp.series('shell', 'sftp-read-logs')
+	gulp.series('shell')//, 'sftp-read-logs')
 );
 gulp.task(
 	'deploy:sl',
@@ -131,6 +133,13 @@ gulp.task('deploy:single', () => {
 		return Promise.reject('FILE_NOT_EXISTS');
 	}
 	return Promise.reject('MISSING_FILE');
+});
+
+/**
+ * @description 清除dist
+ */
+gulp.task('clean', () => {
+	return gulp.src('dist/*', { read: false }).pipe(clean());
 });
 
 gulp.task('sync', gulp.series('deploy:single', 'start-server'));

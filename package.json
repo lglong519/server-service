@@ -38,6 +38,7 @@
 	"devDependencies": {
 		"eslint-config-teslint": "latest",
 		"gulp": "^4.0.0",
+		"gulp-clean": "^0.4.0",
 		"gulp-replace": "^1.0.0",
 		"gulp-ssh": "^0.7.0"
 	},
