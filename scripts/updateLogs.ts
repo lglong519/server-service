@@ -1,8 +1,8 @@
 const debug = require('../modules/Debug').default('task:updateLogs');
 const moment = require('moment');
-const fs = require('fs');
+import * as fs from 'fs';
 
-export = () => {
+const updateLogs = () => {
 	debug(`update logs ${moment().format('YYYY-MM-DD HH:mm:SS')}\n`);
 	const path = '/root/.pm2/logs/';
 	const logs = [
@@ -16,14 +16,16 @@ export = () => {
 		let out = `${path + log}-out.log`;
 		let error = `${path + log}-error.log`;
 		if (fs.existsSync(out)) {
-			fs.rename(out, `${path + moment().format('YYYY-MM-DD-') + log}-out.log`, err => {
-				err && debug(out, err);
-			});
+			fs.renameSync(out, `${path + moment().format('YYYY-MM-DD-') + log}-out.log`);
 		}
+		fs.appendFileSync(out, '1');
 		if (fs.existsSync(error)) {
-			fs.rename(error, `${path + moment().format('YYYY-MM-DD-') + log}-error.log`, err => {
-				err && debug(error, err);
-			});
+			fs.renameSync(error, `${path + moment().format('YYYY-MM-DD-') + log}-error.log`);
 		}
+		fs.appendFileSync(error, '1');
 	});
 };
+export = updateLogs;
+if (process.env.res === '1') {
+	updateLogs();
+}

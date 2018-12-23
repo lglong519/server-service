@@ -39,6 +39,23 @@ const query = (req, res, next) => {
 	let accessesPs = [];
 	let squatsPs = [];
 	let pressUpsPs = [];
+	if (payload) {
+		res.json({
+			'exercise': {
+				'total': 1440,
+				'squats': { 'total': 355, 'week': [0, 0, 0, 0, 0, 0, 0] },
+				'pressUps': { 'total': 1085, 'week': [0, 0, 0, 0, 0, 0, 0] }
+			},
+			'accesses': { 'total': 8, 'week': [15, 5, 20, 1, 50, 30, 10] },
+			'auditlogs': { 'total': 36166, 'week': [10, 5, 30, 27, 60, 79, 38] },
+			'expenses': {
+				'food': { 'week': [0, 0, 0, 0, 0, 0, 0] },
+				'general': { 'week': [0, 0, 0, 0, 0, 0, 0] },
+				'total': 55230
+			}
+		});
+		return next();
+	}
 	$dates.forEach($date => {
 		foodPs.push(req.db.model('Expense').aggregate([
 			{
@@ -85,9 +102,9 @@ const query = (req, res, next) => {
 		pressUpsPs.push(req.db.model('PressUp').aggregate([
 			{
 				$match:
-					{
-						referenceDate: $date
-					}
+				{
+					referenceDate: $date
+				}
 			},
 			{ $group: { _id: null, sum: { $sum: '$count' } } },
 		]).exec().then(result => {
