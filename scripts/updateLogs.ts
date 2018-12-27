@@ -1,6 +1,7 @@
 const debug = require('../modules/Debug').default('task:updateLogs');
 const moment = require('moment');
 import * as fs from 'fs';
+import * as child_process from 'child_process';
 
 const updateLogs = () => {
 	debug(`update logs ${moment().format('YYYY-MM-DD HH:mm:SS')}\n`);
@@ -24,6 +25,7 @@ const updateLogs = () => {
 		}
 		fs.appendFileSync(error, '1');
 	});
+	child_process.execSync('pm2 stop all && pm2 start all');
 };
 export = updateLogs;
 if (process.env.res === '1') {

@@ -8,6 +8,7 @@ const COMMON_API = '/dis/';
 const exposed = new RestifyRouter();
 exposed.post('access-tokens', handlers.AccessTokens.create);
 exposed.get('access-tokens', handlers.AccessTokens.check);
+exposed.post('users', handlers.Users.insert);
 
 const router = new RestifyRouter();
 router.use(middleWares.accToken);

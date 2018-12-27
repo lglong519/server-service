@@ -22,8 +22,11 @@ function scheduleCronstyle () {
 	});
 
 	schedule.scheduleJob('10 0 0 * * *', () => {
-		reset();
 		updateLogs();
+	});
+
+	schedule.scheduleJob('40 0 0 * * *', () => {
+		reset();
 	});
 
 	schedule.scheduleJob('0 10 * * * *', () => {

@@ -4,7 +4,7 @@
 	"description": "api service",
 	"main": "index.js",
 	"scripts": {
-		"dev": "supervisor --no-restart-on error index",
+		"dev": "supervisor --no-restart-on error dist/index",
 		"compile": "tsc -watch false -p ./",
 		"watch": "tsc -watch -p ./",
 		"deploy": "gulp deploy",
@@ -38,6 +38,7 @@
 		}
 	},
 	"devDependencies": {
+		"@types/node": "^10.12.18",
 		"eslint-config-teslint": "latest",
 		"gulp": "^4.0.0",
 		"gulp-clean": "^0.4.0",
@@ -45,6 +46,7 @@
 		"gulp-ssh": "^0.7.0"
 	},
 	"dependencies": {
+		"@types/joi": "^14.0.1",
 		"app-module-path": "^2.2.0",
 		"async": "^2.6.1",
 		"basic-auth": "^2.0.0",

@@ -1,8 +1,9 @@
 const restifyMongoose = require('restify-mongoose');
-const Joi = require('joi');
 const _ = require('lodash');
 const regExp = require('common/regExp');
 const Errors = require('restify-errors');
+import * as Joi from 'joi';
+const RedisService = require('services/RedisService');
 
 const projection = (req, model, cb) => {
 	cb(null, _.pick(model, ['_id', 'inc', 'username', 'client', 'email', 'phone', 'image', 'updatedAt', 'createdAt']));
@@ -17,32 +18,42 @@ const handler = restifyMongoose('User', {
 	listProjection: projection,
 	detailProjection: projection,
 });
-const beforeSave = (req, model, cb) => {
+const insert = (req, res, next) => {
 	const schema = Joi.object().keys({
 		username: Joi.string().regex(regExp.account).required(),
-		email: Joi.string().email().required(),
+		email: Joi.string().email().allow('').lowercase(),
 		phone: Joi.string().regex(regExp.CHNPhone),
 		password: Joi.string().regex(regExp.password).required(),
 		client: Joi.string().valid('ACC').default('ACC').required().required(),
 	}).unknown().required();
-	const validate = Joi.validate(model, schema);
+	const validate = Joi.validate(req.body, schema);
 	if (validate.error) {
-		return cb(new Errors.InvalidArgumentError(validate.error));
+		return next(new Errors.InvalidArgumentError(validate.error));
 	}
-	req.db.model('User').findOne({
+	const params = validate.value;
+	const User = req.db.model('User');
+	User.findOne({
 		username: {
-			'$regex': `^${model.username}$`,
+			'$regex': `^${params.username}$`,
 			'$options': '$i'
 		}
 	}).exec().then(result => {
 		if (result) {
-			cb(new Errors.InvalidArgumentError('USER_EXISTS'));
-		} else {
-			model.role = 'user';
-			cb();
+			throw new Errors.InvalidArgumentError('USER_EXISTS');
 		}
+		params.role = 'user';
+		return User.create(params);
+	}).then(result => {
+		return RedisService.create({
+			user: result._id,
+			client: params.client,
+			return: 'accessToken'
+		});
+	}).then(result => {
+		res.json(result);
+		next();
 	}).catch(err => {
-		cb(err);
+		next(err);
 	});
 };
 const beforeDelete = (req, model) => {
@@ -53,7 +64,7 @@ const beforeDelete = (req, model) => {
 };
 
 export = {
-	insert: handler.insert({ beforeSave }),
+	insert,
 	detail: handler.detail(),
 	delete: handler.delete({ beforeDelete }),
 };
