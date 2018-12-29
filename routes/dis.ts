@@ -15,6 +15,7 @@ router.use(middleWares.accToken);
 router.del('access-tokens', handlers.AccessTokens.remove);
 router.get('me', commonHandlers.Me.profile);
 router.get('weather/:city', commonHandlers.Weather.detail);
+router.patch('me', handlers.Users.update);
 
 router.post('tieba-accounts', tiebaHandlers.TiebaAccounts.insert);
 router.get('tieba-accounts', tiebaHandlers.TiebaAccounts.query);

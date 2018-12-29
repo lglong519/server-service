@@ -163,7 +163,6 @@ class Tieba {
 						kw: item.name,
 						level_id: item.level_id,
 						cur_score: item.cur_score,
-						avatar: item.avatar,
 						active: true
 					},
 					{
