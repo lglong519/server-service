@@ -20,6 +20,12 @@ Content-Type: application/json
 x-serve: service
 x-access-token: {{accessToken}}
 
+### query tieba-accounts users
+GET {{api}}/tieba-accounts/users
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}
+
 ### get a tieba-account
 GET {{api}}/tieba-accounts/5bc20639a612ec187856e111
 Content-Type: application/json

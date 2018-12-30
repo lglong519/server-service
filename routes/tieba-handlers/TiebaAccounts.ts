@@ -3,6 +3,7 @@ const TiebaService = require('../../services/TiebaService');
 const Joi = require('joi');
 const debug = require('debug')('server:tieba');
 const Errors = require('restify-errors');
+const _ = require('lodash');
 
 const handler = restifyMongoose('TiebaAccount', {
 	pageSize: 10,
@@ -127,10 +128,54 @@ const beforeSave = (req, model, cb) => {
 	tb.checkBDUSS().finally(() => {
 		cb();
 	});
-
 };
 
+const userHandler = restifyMongoose('User', {
+	pageSize: 10,
+	sort: '-createdAt',
+	projection,
+	filterAsync (req) {
+		return req.db.model('TiebaAccount').find({}).distinct('user').lean().exec().then(users => {
+			return {
+				_id: {
+					$in: users
+				}
+			};
+		});
+	}
+});
+
+function projection (req, model, cb) {
+	let output = {
+		accounts: 0,
+		tiebas: 0,
+	};
+	req.db.model('TiebaAccount').countDocuments({
+		user: model._id
+	}).then(count => {
+		output.accounts = count;
+		return req.db.model('Tieba').countDocuments({
+			user: model._id
+		});
+	}).then(count => {
+		output.tiebas = count;
+		cb(null, Object.assign(output, _.pick(model, [
+			'_id',
+			'inc',
+			'username',
+			'client',
+			'email',
+			'phone',
+			'image',
+			'updatedAt',
+			'createdAt'
+		])));
+	});
+
+}
+
 export = {
+	users: userHandler.query(),
 	sumarize,
 	sign,
 	insert,

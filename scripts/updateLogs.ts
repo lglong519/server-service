@@ -25,7 +25,7 @@ const updateLogs = () => {
 		}
 		fs.appendFileSync(error, '1');
 	});
-	child_process.execSync('pm2 stop all && pm2 start all');
+	child_process.execSync('pm2 restart all');
 };
 export = updateLogs;
 if (process.env.res === '1') {

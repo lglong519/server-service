@@ -14,6 +14,7 @@ router.patch('tieba-accounts/:id', handlers.TiebaAccounts.update);
 router.del('tieba-accounts/:id', handlers.TiebaAccounts.delete);
 router.post('tieba-accounts/:id/sign', handlers.TiebaAccounts.sign);
 router.get('tieba-accounts/:id/sumarize', handlers.TiebaAccounts.sumarize);
+router.get('tieba-accounts/users', handlers.TiebaAccounts.users);
 
 router.post('tieba-accounts/:id/tiebas/sync', handlers.Tiebas.sync);
 router.post('tieba-accounts/:id/tiebas/reset', handlers.Tiebas.reset);

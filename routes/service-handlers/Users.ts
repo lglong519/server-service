@@ -5,9 +5,7 @@ const regExp = require('common/regExp');
 const Errors = require('restify-errors');
 const { Users } = require('../dis-handlers/Users');
 
-const projection = (req, model, cb) => {
-	cb(null, _.pick(model, ['_id', 'inc', 'username', 'client', 'email', 'phone', 'image', 'updatedAt', 'createdAt']));
-};
+import projection from 'common/projection/user';
 
 const handler = restifyMongoose('User', {
 	listProjection: projection,

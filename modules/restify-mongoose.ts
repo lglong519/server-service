@@ -251,6 +251,7 @@ Resource.prototype.query = function (options) {
 	options.populate = options.populate || this.options.populate;
 	options.select = options.select || this.options.select;
 	options.sort = options.sort || this.options.sort;
+	options.filterAsync = options.filterAsync || this.options.filterAsync;
 
 	return function (req, res, next) {
 		if (typeof self.Model === 'string') {
@@ -272,6 +273,34 @@ Resource.prototype.query = function (options) {
 		applySelect(query, options, req);
 		applyPopulate(query, options, req);
 		applySort(query, options, req);
+
+		if (options.filterAsync) {
+			return options.filterAsync(req, res).then(filter => {
+				query = query.where(filter);
+				countQuery = countQuery.where(filter);
+				const page = Number(req.query.p) >= 0 ? Number(req.query.p) : 0;
+
+				const requestedPageSize = Number(req.query.pageSize) > 0 ? Number(req.query.pageSize) : options.pageSize;
+				const pageSize = Math.min(requestedPageSize, options.maxPageSize);
+
+				query.skip(pageSize * page);
+				query.limit(pageSize + 1);
+
+				async.waterfall(
+					[
+						execQueryWithTotCount(query, countQuery),
+						applyPageLinks(req, res, page, pageSize, options.baseUrl),
+						applyTotalCount(res),
+						buildProjections(req, options.projection),
+						emitEvent(self, 'query'),
+						sendData(res, options.outputFormat, options.modelName, 200)
+					],
+					next
+				);
+			}).catch(err => {
+				next(err);
+			});
+		}
 
 		if (self.options.filter) {
 			query = query.where(self.options.filter(req, res));
