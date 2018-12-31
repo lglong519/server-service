@@ -23,7 +23,7 @@ router.get('tieba-accounts/:id', tiebaHandlers.TiebaAccounts.detail);
 router.patch('tieba-accounts/:id', tiebaHandlers.TiebaAccounts.update);
 router.del('tieba-accounts/:id', tiebaHandlers.TiebaAccounts.delete);
 router.post('tieba-accounts/:id/sign', tiebaHandlers.TiebaAccounts.sign);
-router.get('tieba-accounts/:id/sumarize', tiebaHandlers.TiebaAccounts.sumarize);
+router.get('tieba-accounts/:id/summarize', tiebaHandlers.TiebaAccounts.summarize);
 
 router.post('tieba-accounts/:id/tiebas/sync', tiebaHandlers.Tiebas.sync);
 router.post('tieba-accounts/:id/tiebas/reset', tiebaHandlers.Tiebas.reset);

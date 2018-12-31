@@ -55,7 +55,7 @@ const reset = (req, res, next) => {
 		if (!result.active) {
 			throw Error('INVALID_BDUSS');
 		}
-		return this.db.model('Tieba').update(
+		return req.db.model('Tieba').updateMany(
 			{
 				user: result.user,
 				tiebaAccount: result._id,
@@ -67,10 +67,7 @@ const reset = (req, res, next) => {
 			},
 			{
 				status: 'pendding',
-				desc: '',
-			},
-			{
-				multi: true
+				desc: new Date().toLocaleDateString(),
 			}
 		);
 	}).then(() => {
@@ -81,7 +78,75 @@ const reset = (req, res, next) => {
 	});
 };
 
+const resetAll = (req, res, next) => {
+	let tb = new TiebaService({ db: req.db });
+	tb.resetAll().then(() => {
+		res.send(204);
+		next();
+	}).catch(err => {
+		next(err);
+	});
+};
+
+const summarize = (req, res, next) => {
+	let Tieba = req.db.model('Tieba');
+	let info: {
+		total?: number;
+		void?: number;
+		pendding?: number;
+		resolve?: number;
+		reject?: number;
+		invalid?: number;
+	} = {};
+	let query = function () {
+		return Tieba.find({});
+	};
+	Promise.all([
+		Tieba.countDocuments({}).then(sum => {
+			info.total = sum;
+		}),
+		query().where({
+			void: true,
+			active: true,
+		}).then(results => {
+			info.void = results.length;
+		}),
+		query().where({
+			status: 'pendding',
+			void: false,
+			active: true,
+		}).then(results => {
+			info.pendding = results.length;
+		}),
+		query().where({
+			status: 'resolve',
+			void: false,
+			active: true,
+		}).then(results => {
+			info.resolve = results.length;
+		}),
+		query().where({
+			status: 'reject',
+			void: false,
+			active: true,
+		}).then(results => {
+			info.reject = results.length;
+		}),
+		query().where({
+			active: false,
+		}).then(results => {
+			info.invalid = results.length;
+		}),
+	]).then(() => {
+		res.json(info);
+	}).catch(err => {
+		next(err);
+	});
+};
+
 export = {
+	summarize,
+	resetAll,
 	reset,
 	sync,
 	sign,

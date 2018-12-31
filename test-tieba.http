@@ -53,8 +53,8 @@ POST {{api}}/tieba-accounts/5beec817eed780512e483146/sign
 Content-Type: application/json
 x-serve: service
 
-### sumarize a tieba-account
-GET {{api}}/tieba-accounts/5beec817eed780512e483146/sumarize
+### summarize a tieba-account
+GET {{api}}/tieba-accounts/5beec817eed780512e483146/summarize
 Content-Type: application/json
 x-serve: service
 ### tieba-accounts ------

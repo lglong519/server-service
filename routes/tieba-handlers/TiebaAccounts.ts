@@ -13,6 +13,7 @@ const handler = restifyMongoose('TiebaAccount', {
 const insert = (req, res, next) => {
 	const schema = Joi.object().keys({
 		BDUSS: Joi.string().required(),
+		user: Joi.string().required(),
 	}).unknown().required();
 	const validate = Joi.validate(req.body, schema);
 	if (validate.error) {
@@ -21,7 +22,7 @@ const insert = (req, res, next) => {
 	}
 	let params = validate.value;
 	let tb = new TiebaService({ db: req.db });
-	tb.init(params.BDUSS, req.session.user).then(result => {
+	tb.init(params.BDUSS, params.user).then(result => {
 		res.json(result);
 		next();
 	}).catch(err => {
@@ -31,7 +32,6 @@ const insert = (req, res, next) => {
 
 const beforeDelete = (req, model) => {
 	return req.db.model('Tieba').remove({
-		user: req.session.user,
 		tiebaAccount: model._id
 	});
 };
@@ -56,7 +56,7 @@ const sign = (req, res, next) => {
 	});
 };
 
-const sumarize = (req, res, next) => {
+const summarize = (req, res, next) => {
 	let Tieba = req.db.model('Tieba');
 	let info: {
 		total?: number;
@@ -68,13 +68,11 @@ const sumarize = (req, res, next) => {
 	} = {};
 	let query = function () {
 		return Tieba.find({
-			user: req.session.user,
 			tiebaAccount: req.params.id
 		});
 	};
 	Promise.all([
 		Tieba.countDocuments({
-			user: req.session.user,
 			tiebaAccount: req.params.id
 		}).then(sum => {
 			info.total = sum;
@@ -176,7 +174,7 @@ function projection (req, model, cb) {
 
 export = {
 	users: userHandler.query(),
-	sumarize,
+	summarize,
 	sign,
 	insert,
 	query: handler.query(),

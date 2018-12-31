@@ -1,4 +1,3 @@
-
 const request = require('request-promise');
 const md5 = require('md5');
 const debug = require('debug')('server:TiebaService');
@@ -88,7 +87,8 @@ class Tieba {
 						active: true
 					},
 					{
-						active: false
+						active: false,
+						desc: 'BDUSS 无效'
 					},
 					{
 						multi: true
@@ -352,10 +352,40 @@ class Tieba {
 			let sign = md5(`${decodeURIComponent(query.replace(/&/g, ''))}tiebaclient!!!`).toUpperCase();
 			options.uri += `${query}sign=${sign}`;
 			return request(options);
+			/*
+			 { user_info:
+				{ user_id: '362999496',
+					is_sign_in: '1',
+					user_sign_rank: '2306',
+					sign_time: '1546269124',
+					cont_sign_num: '14',
+					total_sign_num: '599',
+					cout_total_sing_num: '599',
+					hun_sign_num: '87',
+					total_resign_num: '0',
+					is_org_name: '0',
+					sign_bonus_point: '8',
+					miss_sign_num: '1',
+					level_name: '初二年级',
+					levelup_score: '6000'
+				},
+				contri_info: [],
+				server_time: '312515',
+				time: 1546269124,
+				ctime: 0,
+				logid: 724141093,
+				error_code: '0' }
+			*/
 		}).then(result => {
 			debug(tieba.fid, tieba.kw, this.tiebaAccount._id);
 			debug('sign result', result);
-			if (result.error_code != '0' && result.error_code != '160002' && result.error_msg !== '亲，你之前已经签过了' && !result.error) {
+			if (
+				result.error_code != '0'
+				&& result.error_code != '160002'
+				&& result.error_msg !== '亲，你之前已经签过了'
+				&& !result.error
+				&& _.get(result, 'user_info.is_sign_in') != '1'
+			) {
 				throw result;
 			}
 			tieba.status = 'resolve';
@@ -368,7 +398,10 @@ class Tieba {
 			debug(err);
 			return Promise.all([err, tieba.save()]);
 		}).then(results => {
-			return Promise.reject(results[0]);
+			if (Array.isArray(results)) {
+				return Promise.reject(results[0]);
+			}
+			return results;
 		});
 	}
 	/**
@@ -380,6 +413,24 @@ class Tieba {
 				this.signOne(item).catch(err => debug(err));
 			});
 		});
+	}
+	/**
+	 * @description 重置为待签状态:1.有效,2.未忽略,3.非待签
+	 */
+	resetAll () {
+		return this.db.model('Tieba').updateMany(
+			{
+				active: true,
+				void: false,
+				status: {
+					$ne: 'pendding'
+				}
+			},
+			{
+				status: 'pendding',
+				desc: new Date().toLocaleDateString(),
+			}
+		);
 	}
 	/**
 	 * @description serialize params

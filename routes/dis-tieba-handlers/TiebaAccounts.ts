@@ -63,7 +63,7 @@ const sign = (req, res, next) => {
 	});
 };
 
-const sumarize = (req, res, next) => {
+const summarize = (req, res, next) => {
 	let Tieba = req.db.model('Tieba');
 	let info: {
 		total?: number;
@@ -139,7 +139,7 @@ const beforeSave = (req, model, cb) => {
 };
 
 export = {
-	sumarize,
+	summarize,
 	sign,
 	insert,
 	query: handler.query(),
