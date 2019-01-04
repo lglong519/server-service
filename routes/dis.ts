@@ -14,7 +14,7 @@ const router = new RestifyRouter();
 router.use(middleWares.accToken);
 router.del('access-tokens', handlers.AccessTokens.remove);
 router.get('me', commonHandlers.Me.profile);
-router.get('weather/:city', commonHandlers.Weather.detail);
+router.get('weather/:city', commonHandlers.weather.detail);
 router.patch('me', handlers.Users.update);
 
 router.post('tieba-accounts', tiebaHandlers.TiebaAccounts.insert);

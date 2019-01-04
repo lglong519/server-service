@@ -74,6 +74,7 @@ gulp.task('sftp-read-logs', () => {
 
 gulp.task('sftp-write', () => gulp.src('.config')
 	.pipe(replace('"NODE_ENV": "localhost"', '"NODE_ENV": "development"'))
+	.pipe(replace(/"http:\/\/(\d+\.\d+\.\d+\.\d+|localhost)(.*)?",/g, ''))
 	.pipe(gulpSSH.sftp('write', `${nconf.get('SERVER')}.config`)));
 
 gulp.task('start-server', () => gulpSSH.shell([
@@ -143,3 +144,4 @@ gulp.task('clean', () => {
 });
 
 gulp.task('sync', gulp.series('deploy:single', 'start-server'));
+// gulp.task('sync', gulp.series('deploy:single'));

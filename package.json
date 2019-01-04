@@ -38,7 +38,10 @@
 		}
 	},
 	"devDependencies": {
+		"@types/joi": "^14.0.1",
+		"@types/nconf": "0.0.37",
 		"@types/node": "^10.12.18",
+		"@types/request-promise": "^4.1.42",
 		"eslint-config-teslint": "latest",
 		"gulp": "^4.0.0",
 		"gulp-clean": "^0.4.0",
@@ -46,7 +49,6 @@
 		"gulp-ssh": "^0.7.0"
 	},
 	"dependencies": {
-		"@types/joi": "^14.0.1",
 		"app-module-path": "^2.2.0",
 		"async": "^2.6.1",
 		"basic-auth": "^2.0.0",
@@ -70,7 +72,7 @@
 		"rand-token": "^0.4.0",
 		"request": "^2.88.0",
 		"request-promise": "^4.2.2",
-		"require-dir": "^1.0.0",
+		"require-dir": "^1.2.0",
 		"restify": "^7.2.1",
 		"restify-cookies": "^0.2.5",
 		"restify-cors-middleware": "^1.1.1",

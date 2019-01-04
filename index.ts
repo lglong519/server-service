@@ -1,5 +1,5 @@
 const restify = require('restify');
-const nconf = require('nconf');
+import * as nconf from 'nconf';
 const CookieParser = require('restify-cookies');
 require('debug').enable('*,-morgan');
 
@@ -19,10 +19,13 @@ nconf.required([
 	'PORT',
 	'CORS',
 ]);
+nconf.defaults({
+	server: require(`${process.cwd()}/package`).name
+});
 process.env.NODE_ENV = nconf.get('NODE_ENV');
 
 const server = restify.createServer({
-	name: require(`${process.cwd()}/package`).name
+	name: nconf.get('server')
 });
 server.server.setTimeout(120000);
 

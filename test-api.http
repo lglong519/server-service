@@ -194,3 +194,13 @@ x-serve: service
 GET {{api}}/auditlogs
 Content-Type: application/json
 x-serve: service
+
+### query weather
+GET {{api}}/weather
+Content-Type: application/json
+x-serve: service
+
+### query weather
+GET {{api}}/weather/广州
+Content-Type: application/json
+x-serve: service
