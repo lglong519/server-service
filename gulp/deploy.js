@@ -143,5 +143,5 @@ gulp.task('clean', () => {
 	return gulp.src('dist/*', { read: false }).pipe(clean());
 });
 
-gulp.task('sync', gulp.series('deploy:single', 'start-server'));
-// gulp.task('sync', gulp.series('deploy:single'));
+// gulp.task('sync', gulp.series('deploy:single', 'start-server'));
+gulp.task('sync', gulp.series('deploy:single'));

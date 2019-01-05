@@ -9,11 +9,23 @@ export = () => {
 	connections.then(results => {
 		db = results[0].service;
 		return db.model('Tieba').find({
-			active: true,
-			void: false,
-			status: {
-				$ne: 'resolve'
-			}
+			$or: [
+				{
+					void: false,
+					active: true,
+					status: {
+						$ne: 'resolve'
+					}
+				},
+				{
+					status: 'resolve',
+					update: {
+						$lt: new Date(`${new Date().toLocaleDateString()} 00:00`)
+					},
+					void: false,
+					active: true,
+				}
+			]
 		}).populate('tiebaAccount').sort('sequence').limit(400).exec();
 	}).then(results => {
 		results.forEach(tieba => {

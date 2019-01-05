@@ -38,7 +38,7 @@ const sign = (req, res, next) => {
 			throw Error('ERR_TIEBA_NOT_FOUND');
 		}
 		tb.tiebaAccount = result.tiebaAccount;
-		return tb.signOne(result);
+		return tb.signOne(result, 1);
 	}).then(result => {
 		res.json(result);
 		next();

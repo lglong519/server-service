@@ -318,14 +318,20 @@ class Tieba {
 	 * @description sign one
 	 * @param {Object} tieba
 	 * @requires tiebaAccount.active
+	 * @requires re 无条件签到
 	 * @returns void
 	 */
-	signOne (tieba) {
+	signOne (tieba, re?: number) {
 		if (this.tiebaAccount && !this.tiebaAccount.active) {
 			return Promise.reject('INVALID_BDUSS');
 		}
-		if (tieba.status == 'resolve' || tieba.void || !tieba.active) {
-			return Promise.resolve(tieba);
+		if (!re) {
+			if (new Date(tieba.update) > new Date(`${new Date().toLocaleDateString()} 00:00`) && tieba.status == 'resolve') {
+				return Promise.resolve(tieba);
+			}
+			if (tieba.void || !tieba.active) {
+				return Promise.resolve(tieba);
+			}
 		}
 
 		let options = {
@@ -379,11 +385,13 @@ class Tieba {
 		}).then(result => {
 			debug(tieba.fid, tieba.kw, this.tiebaAccount._id);
 			debug('sign result', result);
-			if (_.get(result, 'user_info.is_sign_in') == '1' || _.get(result, 'error_msg') != '亲，你之前已经签过了') {
+			if (_.get(result, 'user_info.is_sign_in') == '1' || _.get(result, 'error_msg') == '亲，你之前已经签过了') {
 				tieba.status = 'resolve';
 				tieba.desc = result.error_msg || '';
 			} else {
 				tieba.status = 'reject';
+				// 出错的移动到签到队伍最后
+				tieba.sequence = Date.now();
 				tieba.desc = result.error_msg || result.message || _.get(result, 'error.errmsg') || _.get(result, 'error.usermsg') || 'UNKNOWN_ERROR';
 			}
 			return tieba.save();

@@ -4,6 +4,7 @@ const restifyErrors = require('restify-errors');
 const util = require('util');
 const url = require('url');
 const EventEmitter = require('events').EventEmitter;
+import populate from '../common/populate'
 
 const restifyError = function (err) {
 
@@ -204,9 +205,21 @@ const applySelect = function (query, options, req) {
 };
 
 const applyPopulate = function (query, options, req) {
-	const populate = req.query.populate || options.populate;
-	if (populate) {
-		query = query.populate(parseCommaParam(populate));
+	if (req.query.populate) {
+		let pops = req.query.populate.split(',');
+		pops.forEach(item => {
+			item = item.trim();
+			if (item) {
+				if (populate[item]) {
+					query = query.populate(item, populate[item]);
+				} else {
+					query = query.populate(item);
+				}
+			}
+		});
+	}
+	if (options.populate) {
+		query = query.populate(parseCommaParam(options.populate));
 	}
 };
 
