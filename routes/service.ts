@@ -52,9 +52,6 @@ router.del('waists/:id', handlers.Waists.delete);
 
 router.get('aggregation', handlers.Aggregation.query);
 router.get('aggregation/git/:owner', handlers.Aggregation.git);
-router.get('weather/:city', commonHandlers.Weather.byCity);
-router.get('weather', commonHandlers.Weather.detail);
-router.get('address', commonHandlers.Address.detail);
 
 router.post('expenses', handlers.Expenses.insert);
 router.get('expenses', handlers.Expenses.query);

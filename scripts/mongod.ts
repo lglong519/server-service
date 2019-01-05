@@ -3,7 +3,7 @@ const child_process = require('child_process');
 const moment = require('moment');
 const fs = require('fs');
 
-export = () => {
+export default function mongod () {
 	debug(`check mongod status ${moment().format('YYYY-MM-DD HH:mm:SS')}\n`);
 	child_process.exec('service mongod status', (err, stdout, stderr) => {
 		let msg = stdout && stdout.match(/active:(.*)?/i);
@@ -30,10 +30,9 @@ export = () => {
 			child_process.execSync('pm2 start all');
 		}
 	});
-};
-
+}
 if (process.env.res === '1') {
-	exports();
+	mongod();
 }
 /* stdout
 mongod.service - High-performance, schema-free document-oriented database

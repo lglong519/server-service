@@ -1,9 +1,10 @@
 require('../modules/Debug').enable('task:*');
 const schedule = require('node-schedule');
 const debug = require('../modules/Debug').default('task:index');
-const mongod = require('./mongod.js');
 const reset = require('./reset.js');
 const updateLogs = require('./updateLogs.js');
+import mongod from './mongod';
+
 let sign;
 try {
 	sign = require('./sign.js');

@@ -112,13 +112,28 @@ const summarize = (req, res, next) => {
 			info.void = results.length;
 		}),
 		query().where({
-			status: 'pendding',
-			void: false,
-			active: true,
+			$or: [
+				{
+					status: 'pendding',
+					void: false,
+					active: true,
+				},
+				{
+					status: 'resolve',
+					update: {
+						$lt: new Date(`${new Date().toLocaleDateString()} 00:00`)
+					},
+					void: false,
+					active: true,
+				}
+			]
 		}).then(results => {
 			info.pendding = results.length;
 		}),
 		query().where({
+			update: {
+				$gte: new Date(`${new Date().toLocaleDateString()} 00:00`)
+			},
 			status: 'resolve',
 			void: false,
 			active: true,

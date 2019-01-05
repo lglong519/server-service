@@ -1,6 +1,6 @@
 const request = require('request-promise');
 const md5 = require('md5');
-const debug = require('debug')('server:TiebaService');
+const debug = require('Debug').default('server:TiebaService');
 const _ = require('lodash');
 
 class Tieba {
@@ -379,29 +379,14 @@ class Tieba {
 		}).then(result => {
 			debug(tieba.fid, tieba.kw, this.tiebaAccount._id);
 			debug('sign result', result);
-			if (
-				result.error_code != '0'
-				&& result.error_code != '160002'
-				&& result.error_msg !== '亲，你之前已经签过了'
-				&& !result.error
-				&& _.get(result, 'user_info.is_sign_in') != '1'
-			) {
-				throw result;
+			if (_.get(result, 'user_info.is_sign_in') == '1' || _.get(result, 'error_msg') != '亲，你之前已经签过了') {
+				tieba.status = 'resolve';
+				tieba.desc = result.error_msg || '';
+			} else {
+				tieba.status = 'reject';
+				tieba.desc = result.error_msg || result.message || _.get(result, 'error.errmsg') || _.get(result, 'error.usermsg') || 'UNKNOWN_ERROR';
 			}
-			tieba.status = 'resolve';
-			tieba.desc = result.error_msg || '';
 			return tieba.save();
-		}).catch(err => {
-			tieba.status = 'reject';
-			tieba.desc = err.error_msg || err.message || _.get(err, 'error.errmsg') || _.get(err, 'error.usermsg') || 'UNKNOWN_ERROR';
-			tieba.sequence = Date.now();
-			debug(err);
-			return Promise.all([err, tieba.save()]);
-		}).then(results => {
-			if (Array.isArray(results)) {
-				return Promise.reject(results[0]);
-			}
-			return results;
 		});
 	}
 	/**

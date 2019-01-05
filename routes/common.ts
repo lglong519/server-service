@@ -12,6 +12,10 @@ router.get('tags/:id', handlers.Tags.detail);
 router.patch('tags/:id', handlers.Tags.update);
 router.del('tags/:id', handlers.Tags.delete);
 
+router.get('weather/:city', handlers.Weather.byCity);
+router.get('weather', handlers.Weather.detail);
+router.get('address', handlers.Address.detail);
+
 export default server => {
 	router.applyRoutes(server, COMMON_API);
 };
