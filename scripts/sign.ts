@@ -19,7 +19,7 @@ export = () => {
 				},
 				{
 					status: 'resolve',
-					update: {
+					updatedAt: {
 						$lt: new Date(`${new Date().toLocaleDateString()} 00:00`)
 					},
 					void: false,

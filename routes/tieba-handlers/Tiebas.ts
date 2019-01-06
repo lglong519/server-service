@@ -120,7 +120,7 @@ const summarize = (req, res, next) => {
 				},
 				{
 					status: 'resolve',
-					update: {
+					updatedAt: {
 						$lt: new Date(`${new Date().toLocaleDateString()} 00:00`)
 					},
 					void: false,
@@ -131,7 +131,7 @@ const summarize = (req, res, next) => {
 			info.pendding = results.length;
 		}),
 		query().where({
-			update: {
+			updatedAt: {
 				$gte: new Date(`${new Date().toLocaleDateString()} 00:00`)
 			},
 			status: 'resolve',
