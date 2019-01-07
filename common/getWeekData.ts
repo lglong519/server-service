@@ -1,6 +1,6 @@
 const DateTime = require('./dateTime');
-const moment = require('moment');
-const _ = require('lodash');
+import * as moment from 'moment';
+import * as _ from 'lodash';
 
 const format = 'YYYY-MM-DD';
 

@@ -39,9 +39,11 @@
 	},
 	"devDependencies": {
 		"@types/joi": "^14.0.1",
+		"@types/lodash": "^4.14.119",
 		"@types/nconf": "0.0.37",
 		"@types/node": "^10.12.18",
 		"@types/request-promise": "^4.1.42",
+		"@types/restify-errors": "^4.3.3",
 		"eslint-config-teslint": "latest",
 		"gulp": "^4.0.0",
 		"gulp-clean": "^0.4.0",

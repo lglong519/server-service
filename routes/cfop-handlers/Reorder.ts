@@ -1,5 +1,5 @@
 
-const Joi = require('joi');
+import * as Joi from 'joi';
 const debug = require('debug')('server:cfop');
 const Errors = require('restify-errors');
 

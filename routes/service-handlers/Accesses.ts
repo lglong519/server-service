@@ -1,8 +1,8 @@
 const restifyMongoose = require('restify-mongoose');
 const Model = require('common/Model');
-const Joi = require('joi');
-const _ = require('lodash');
-const moment = require('moment');
+import * as Joi from 'joi';
+import * as _ from 'lodash';
+import * as moment from 'moment';
 const debug = require('debug')('server:api');
 const Errors = require('restify-errors');
 const getClient = require('common/getClient');

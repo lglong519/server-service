@@ -1,6 +1,6 @@
 const restifyMongoose = require('restify-mongoose');
-const Joi = require('joi');
-const _ = require('lodash');
+import * as Joi from 'joi';
+import * as _ from 'lodash';
 const regExp = require('common/regExp');
 const Errors = require('restify-errors');
 const { Users } = require('../dis-handlers/Users');

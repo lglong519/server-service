@@ -32,12 +32,11 @@ const mainSchema = new Schema({
 	},
 	level_id: {
 		type: Number,
+		default: 0,
 	},
 	cur_score: {
 		type: Number,
-	},
-	avatar: {
-		type: String,
+		default: 0,
 	},
 	void: {
 		type: Boolean,

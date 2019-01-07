@@ -1,6 +1,6 @@
 const RedisService = require('services/RedisService');
 const regExp = require('common/regExp');
-const Joi = require('joi');
+import * as Joi from 'joi';
 const Errors = require('restify-errors');
 const Model = require('common/Model');
 const debug = require('debug')('server:api');

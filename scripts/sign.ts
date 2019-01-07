@@ -1,7 +1,7 @@
 const connections = require('./connections');
 const debug = require('debug')('task:sign');
-const TiebaService = require('../services/TiebaService');
-const moment = require('moment');
+import TiebaService from '../services/TiebaService';
+import * as moment from 'moment';
 
 export = () => {
 	debug(`\nsign all ${moment().format('YYYY-MM-DD HH:mm:SS')}\n`);

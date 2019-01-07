@@ -1,7 +1,7 @@
 const Redis = require('ioredis');
-const Joi = require('joi');
+import * as Joi from 'joi';
 const RandToken = require('rand-token');
-const _ = require('lodash');
+import * as _ from 'lodash';
 const nconf = require('nconf');
 const debug = require('debug');
 const DateTime = require('../common/dateTime');

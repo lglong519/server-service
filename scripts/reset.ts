@@ -1,6 +1,6 @@
 const MongoClient = require('mongodb').MongoClient;
 const debug = require('../modules/Debug').default('task:reset');
-const moment = require('moment');
+import * as moment from 'moment';
 
 const reset = () => {
 	debug(`\nreset all ${moment().format('YYYY-MM-DD HH:mm:SS')}\n`);

@@ -3,7 +3,7 @@ nconf.required(['MONGO_URI']);
 
 const debug = require('Debug').default('server:connections');
 const debugErr = require('debug')('connections:Error');
-const _ = require('lodash');
+import * as _ from 'lodash';
 const mongoose = require('mongoose');
 const MONGO_URI = nconf.get('MONGO_URI');
 const timestamps = require('mongoose-timestamp');

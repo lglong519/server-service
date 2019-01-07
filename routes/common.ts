@@ -4,7 +4,7 @@ const middleWares = require('require-dir')('middleWares');
 const COMMON_API = '/common/';
 
 const router = new RestifyRouter();
-router.use(middleWares.initToken);
+router.use(middleWares.accToken);
 
 router.post('tags', handlers.Tags.insert);
 router.get('tags', handlers.Tags.query);

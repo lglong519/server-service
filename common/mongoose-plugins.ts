@@ -1,5 +1,5 @@
-const Joi = require('joi');
-const _ = require('lodash');
+import * as Joi from 'joi';
+import * as _ from 'lodash';
 const nconf = require('nconf');
 const crypto = require('crypto');
 const ALGORITHM = 'aes-256-cbc';

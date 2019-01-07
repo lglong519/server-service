@@ -1,5 +1,5 @@
 const restifyMongoose = require('restify-mongoose');
-const _ = require('lodash');
+import * as _ from 'lodash';
 const regExp = require('common/regExp');
 const Errors = require('restify-errors');
 import * as Joi from 'joi';

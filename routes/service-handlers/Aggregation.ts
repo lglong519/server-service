@@ -3,7 +3,7 @@ const request = require('request-promise');
 const DateTime = require('common/dateTime');
 const debug = require('debug')('server:Aggregation');
 const nconf = require('nconf');
-const _ = require('lodash');
+import * as _ from 'lodash';
 const ProcessService = require('services/ProcessService');
 const localStorage = require('common/localStorage');
 const getWeekData = require('common/getWeekData');
@@ -290,7 +290,7 @@ function _gitOnlineFecth (req, res, next) {
 				};
 				repo.week = getWeekData(results, 'commit.committer.date');
 				repo.today = repo.week[6];
-				payload.commits.week = _.zipWith(payload.commits.week, repo.week, (a, b) => a + b);
+				payload.commits.week = _.zipWith(payload.commits.week, repo.week, (a: number, b: number) => a + b);
 				payload.commits.list[item.name] = repo;
 				debug(`${++n} finish repo:`, item.name);
 			}));

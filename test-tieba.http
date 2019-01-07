@@ -59,12 +59,23 @@ Content-Type: application/json
 x-serve: service
 ### tieba-accounts ------
 
-
 ### sync
 POST {{api}}/tieba-accounts/5bef2cd9eed780512e489ce4/tiebas/sync
 Content-Type: application/json
 x-serve: service
 x-access-token: {{accessToken}}
+
+### create a tieba
+POST {{api}}/tiebas
+Content-Type: application/json
+x-serve: service
+x-access-token: {{accessToken}}
+
+{
+	"tiebaAccount": "5c26ee2aedadca58a1c37d68",
+    "user": "5c26ebc8edadca58a1c37d4b",
+	"kw":"魔方"
+}
 
 ### get tiebas
 GET {{api}}/tiebas

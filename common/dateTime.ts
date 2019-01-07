@@ -5,8 +5,8 @@
 // offsetInMinutes
 // offsetInSeconds
 // format：'YYYY-MM-DD HH:mm:SS'
-const Joi = require('joi');
-const moment = require('moment');
+import * as Joi from 'joi';
+import * as moment from 'moment';
 
 /**
  * @param {Date} [time] 被计算的时间，默认：当前时间

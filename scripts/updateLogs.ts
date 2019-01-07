@@ -1,5 +1,5 @@
 const debug = require('../modules/Debug').default('task:updateLogs');
-const moment = require('moment');
+import * as moment from 'moment';
 import * as fs from 'fs';
 import * as child_process from 'child_process';
 

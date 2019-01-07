@@ -1,6 +1,6 @@
 const debug = require('../modules/Debug').default('task:mongod');
 const child_process = require('child_process');
-const moment = require('moment');
+import * as moment from 'moment';
 const fs = require('fs');
 
 export default function mongod () {

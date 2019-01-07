@@ -1,6 +1,6 @@
-const TiebaService = require('../../services/TiebaService');
+import TiebaService from '../../services/TiebaService';
 const restifyMongoose = require('restify-mongoose');
-const Joi = require('joi');
+import * as Joi from 'joi';
 const debug = require('debug')('server:tieba');
 const Errors = require('restify-errors');
 
@@ -40,7 +40,7 @@ const sync = (req, res, next) => {
 };
 
 const sign = (req, res, next) => {
-	let tb = new TiebaService({ db: req.db, user: req.session.user });
+	let tb = new TiebaService({ db: req.db });
 	req.db.model('Tieba').findOne({
 		_id: req.params.id,
 		user: req.session.user

@@ -1,5 +1,5 @@
 const restifyMongoose = require('restify-mongoose');
-const _ = require('lodash');
+import * as _ from 'lodash';
 
 const handle = restifyMongoose('Auditlog', {
 	pageSize: 10,

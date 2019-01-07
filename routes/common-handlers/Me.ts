@@ -1,4 +1,4 @@
-const _ = require('lodash');
+import * as _ from 'lodash';
 
 const profile = (req, res, next) => {
 	let User = req.db.model('User');

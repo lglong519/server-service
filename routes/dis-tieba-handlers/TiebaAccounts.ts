@@ -1,6 +1,6 @@
 const restifyMongoose = require('restify-mongoose');
-const TiebaService = require('../../services/TiebaService');
-const Joi = require('joi');
+import TiebaService from '../../services/TiebaService';
+import * as Joi from 'joi';
 const debug = require('debug')('server:tieba');
 const Errors = require('restify-errors');
 

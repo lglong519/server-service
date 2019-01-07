@@ -1,9 +1,9 @@
 const request = require('request-promise');
 const md5 = require('md5');
 const debug = require('Debug').default('server:TiebaService');
-const _ = require('lodash');
+import * as _ from 'lodash';
 
-class Tieba {
+export default class Tieba {
 
 	db: any;
 	page_size: number;
@@ -315,6 +315,34 @@ class Tieba {
 		return request(options);
 	}
 	/**
+	 * @description get tbs for sign
+	 * @requires BDUSS||tiebaAccount.BDUSS
+	 */
+	getFid (kw: string) {
+		if (!_.get(this, 'tiebaAccount.BDUSS')) {
+			return Promise.reject('INVALID_BDUSS');
+		}
+		let options = {
+			uri: `http://tieba.baidu.com/mo/m?kw=${encodeURI(kw)}`,
+			headers: {
+				'User-Agent': 'mc phone',
+				'Referer': 'http://wapp.baidu.com/',
+				'Content-Type': 'application/x-www-form-urlencoded',
+				Cookie: `BDUSS=${this.tiebaAccount.BDUSS}`
+			},
+			json: true,
+		};
+		return request(options).then(result => {
+			let fid = result.match(/name="fid"\s*value="(\d+)"/);
+			if (fid) {
+				return {
+					fid: fid[1]
+				};
+			}
+			throw Error('FID_NOT_FOUND');
+		});
+	}
+	/**
 	 * @description sign one
 	 * @param {Object} tieba
 	 * @requires tiebaAccount.active
@@ -438,4 +466,3 @@ class Tieba {
 	}
 
 }
-export = Tieba;

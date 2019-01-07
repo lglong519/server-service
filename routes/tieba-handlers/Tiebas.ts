@@ -1,8 +1,8 @@
-const TiebaService = require('../../services/TiebaService');
+import TiebaService from '../../services/TiebaService';
 const restifyMongoose = require('restify-mongoose');
-const Joi = require('joi');
-const debug = require('debug')('server:tieba');
-const Errors = require('restify-errors');
+const debug = require('Debug').default('server:tieba');
+import * as Joi from 'joi';
+import * as Errors from 'restify-errors';
 
 const handler = restifyMongoose('Tieba', {
 	pageSize: 10,
@@ -10,6 +10,46 @@ const handler = restifyMongoose('Tieba', {
 });
 
 const insert = (req, res, next) => {
+	const schema = Joi.object().keys({
+		user: Joi.string().required(),
+		tiebaAccount: Joi.string().required(),
+		kw: Joi.string().required(),
+	}).required();
+	const validate = Joi.validate(req.body, schema);
+	if (validate.error) {
+		debug('insert validate.error', validate.error);
+		return next(new Errors.InvalidArgumentError(validate.error));
+	}
+	const params = validate.value;
+	let tb = new TiebaService({ db: req.db });
+	req.db.model('TiebaAccount').findById(params.tiebaAccount).exec().then(result => {
+		if (!result) {
+			throw Error('ERR_TIEBA_ACCOUNT_NOT_FOUND');
+		}
+		if (!result.active) {
+			throw Error('INVALID_BDUSS');
+		}
+		tb.tiebaAccount = result;
+		return tb.getFid(params.kw);
+	}).then(result => {
+		return req.db.model('Tieba').findOneAndUpdate(
+			{
+				...result,
+				...params
+			},
+			{},
+			{
+				upsert: true,
+				new: true,
+				setDefaultsOnInsert: true
+			}
+		);
+	}).then(() => {
+		res.send(204);
+		next();
+	}).catch(err => {
+		next(err);
+	});
 
 };
 
@@ -32,7 +72,7 @@ const sync = (req, res, next) => {
 };
 
 const sign = (req, res, next) => {
-	let tb = new TiebaService({ db: req.db, user: req.session.user });
+	let tb = new TiebaService({ db: req.db });
 	req.db.model('Tieba').findById(req.params.id).populate('tiebaAccount').then(result => {
 		if (!result) {
 			throw Error('ERR_TIEBA_NOT_FOUND');
