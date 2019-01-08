@@ -444,11 +444,11 @@ export default class Tieba {
 				active: true,
 				void: false,
 				status: {
-					$ne: 'pendding'
+					$ne: 'pending'
 				}
 			},
 			{
-				status: 'pendding',
+				status: 'pending',
 				desc: new Date().toLocaleDateString(),
 			}
 		);

@@ -14,6 +14,7 @@ const insert = (req, res, next) => {
 		user: Joi.string().required(),
 		tiebaAccount: Joi.string().required(),
 		kw: Joi.string().required(),
+		fid: Joi.string()
 	}).required();
 	const validate = Joi.validate(req.body, schema);
 	if (validate.error) {
@@ -30,6 +31,9 @@ const insert = (req, res, next) => {
 			throw Error('INVALID_BDUSS');
 		}
 		tb.tiebaAccount = result;
+		if (params.fid) {
+			return {};
+		}
 		return tb.getFid(params.kw);
 	}).then(result => {
 		return req.db.model('Tieba').findOneAndUpdate(
@@ -102,11 +106,11 @@ const reset = (req, res, next) => {
 				active: true,
 				void: false,
 				status: {
-					$ne: 'pendding'
+					$ne: 'pending'
 				}
 			},
 			{
-				status: 'pendding',
+				status: 'pending',
 				desc: new Date().toLocaleDateString(),
 			}
 		);
@@ -133,7 +137,7 @@ const summarize = (req, res, next) => {
 	let info: {
 		total?: number;
 		void?: number;
-		pendding?: number;
+		pending?: number;
 		resolve?: number;
 		reject?: number;
 		invalid?: number;
@@ -154,7 +158,7 @@ const summarize = (req, res, next) => {
 		query().where({
 			$or: [
 				{
-					status: 'pendding',
+					status: 'pending',
 					void: false,
 					active: true,
 				},
@@ -168,7 +172,7 @@ const summarize = (req, res, next) => {
 				}
 			]
 		}).then(results => {
-			info.pendding = results.length;
+			info.pending = results.length;
 		}),
 		query().where({
 			updatedAt: {

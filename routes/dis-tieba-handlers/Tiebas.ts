@@ -76,11 +76,11 @@ const reset = (req, res, next) => {
 				active: true,
 				void: false,
 				status: {
-					$ne: 'pendding'
+					$ne: 'pending'
 				}
 			},
 			{
-				status: 'pendding',
+				status: 'pending',
 				desc: '',
 			},
 			{

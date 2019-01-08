@@ -68,7 +68,7 @@ const summarize = (req, res, next) => {
 	let info: {
 		total?: number;
 		void?: number;
-		pendding?: number;
+		pending?: number;
 		resolve?: number;
 		reject?: number;
 		invalid?: number;
@@ -95,7 +95,7 @@ const summarize = (req, res, next) => {
 		query().where({
 			$or: [
 				{
-					status: 'pendding',
+					status: 'pending',
 					void: false,
 					active: true,
 				},
@@ -109,7 +109,7 @@ const summarize = (req, res, next) => {
 				}
 			]
 		}).then(results => {
-			info.pendding = results.length;
+			info.pending = results.length;
 		}),
 		query().where({
 			updatedAt: {

@@ -22,8 +22,8 @@ const mainSchema = new Schema({
 	},
 	status: {
 		type: String,
-		enum: ['pendding', 'resolve', 'reject'],
-		default: 'pendding',
+		enum: ['pending', 'resolve', 'reject'],
+		default: 'pending',
 		required: true,
 	},
 	desc: {

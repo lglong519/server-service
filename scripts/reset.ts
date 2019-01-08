@@ -13,11 +13,11 @@ const reset = () => {
 			active: true,
 			void: false,
 			status: {
-				$ne: 'pendding'
+				$ne: 'pending'
 			}
 		}, {
 			$set: {
-				status: 'pendding',
+				status: 'pending',
 				desc: new Date().toLocaleDateString(),
 				updatedAt: new Date()
 			}
