@@ -57,7 +57,7 @@ class Users {
 			email: Joi.string().email().allow('').lowercase(),
 			phone: Joi.string().regex(regExp.CHNPhone),
 			password: Joi.string().regex(regExp.password).required(),
-			client: Joi.string().valid('ACC').default('ACC').required().required(),
+			client: Joi.string().valid(['ACC', 'BOOK']).default('ACC').required().required(),
 		}).unknown().required();
 		return Joi.validate(body, schema);
 	}

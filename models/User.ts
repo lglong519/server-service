@@ -27,7 +27,7 @@ const mainSchema = new Schema({
 	},
 	client: {
 		type: String,
-		enum: ['ACC', 'CNS'],
+		enum: ['ACC', 'CNS', 'BOOK'],
 		required: true,
 	},
 	inc: {

@@ -16,7 +16,7 @@ const create = (req, res, next) => {
 			Joi.string().regex(regExp.CHNPhone)
 		).required(),
 		password: Joi.string().regex(regExp.password).required(),
-		client: Joi.string().default('ACC').valid(['ACC']).required(),
+		client: Joi.string().default('ACC').valid(['ACC', 'BOOK']).required(),
 	}).required();
 	const validate = Joi.validate(req.body, schema);
 	if (validate.error) {
