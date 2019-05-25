@@ -12,6 +12,7 @@ publicRouter.post('access-tokens', handlers.AccessTokens.create);
 publicRouter.get('access-tokens', handlers.AccessTokens.check);
 publicRouter.get('packages', handlers.Packages.query);
 publicRouter.get('packages/:id', handlers.Packages.detail);
+publicRouter.post('messages', handlers.Messages.insert);
 publicRouter.get('test', handlers.Test);
 publicRouter.post('test', handlers.Test);
 
@@ -74,6 +75,11 @@ router.del('favorites/:id', handlers.Favorites.delete);
 
 router.get('auditlogs', handlers.Auditlogs.query);
 router.get('auditlogs/:id', handlers.Auditlogs.detail);
+
+router.get('messages', handlers.Messages.query);
+router.get('messages/:id', handlers.Messages.detail);
+router.patch('messages/:id', handlers.Messages.update);
+router.del('messages/:id', handlers.Messages.delete);
 
 export default server => {
 	server.use(middleWares.InitProps);
