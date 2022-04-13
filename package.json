@@ -52,7 +52,7 @@
 	},
 	"dependencies": {
 		"app-module-path": "^2.2.0",
-		"async": "^2.6.1",
+		"async": "^3.2.2",
 		"basic-auth": "^2.0.0",
 		"cheerio": "^1.0.0-rc.2",
 		"depd": "^1.1.2",
